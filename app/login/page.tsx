@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { supabase } from '@/lib/supbase';
+import Image from 'next/image';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -15,8 +16,8 @@ export default function Login() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true); //shows a loading while request is in progress
-        setError(null); 
+        setLoading(true); // shows loading while request is in progress
+        setError(null);
 
         try {
             const { error: authError } = await supabase.auth.signInWithPassword({
@@ -36,10 +37,23 @@ export default function Login() {
         }
     };
 
+    const handleGoogleLogin = async () => {
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+            });
+            if (error) {
+                setError(error.message);
+            }
+        } catch (err) {
+            setError('An unexpected error occurred.');
+        }
+    };
+
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-            <div className="w-96 p-8 bg-white rounded-2xl shadow-xl">
-                <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Admin Login</h1>
+        <div className="flex min-h-screen items-center justify-center bg-gray-900">
+            <div className="w-96 p-8 bg-gray-800 text-white rounded-2xl shadow-2xl">
+                <h1 className="text-3xl font-bold text-center mb-6">Admin Login</h1>
                 {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -48,7 +62,7 @@ export default function Login() {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     <div className="relative">
@@ -57,7 +71,7 @@ export default function Login() {
                             placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
                             type="button"
@@ -75,7 +89,25 @@ export default function Login() {
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
+
+                    {/* Forgot Password */}
+                    <div className="text-center mt-4">
+                        <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                            Forgot Password?
+                        </a>
+                    </div>
                 </form>
+
+                {/* Google Login */}
+                <div className="flex items-center justify-center mt-6">
+                    <button
+                        onClick={handleGoogleLogin}
+                        className="flex items-center justify-center w-full px-4 py-2 bg-transparent border border-gray-500 rounded-lg hover:bg-gray-500 transition"
+                    >
+                        <Image src="/google-logo.png" alt="Google Logo" width={30} height={30} className="mr-3" />
+                        <span className="text-white-100">Login with Google</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

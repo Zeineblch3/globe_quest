@@ -4,45 +4,45 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supbase';
 import { ChevronLeft, ChevronRight, MapPin, User, LogOutIcon, Settings, UserCircle } from 'lucide-react';
+import ManageTours from './manage-tours';
+import ManageGuides from './manage-guides';
 
 export default function Dashboard() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<any>(null); // Define user type as needed
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | null>(null); // Set initial state to null
     const router = useRouter();
 
     useEffect(() => {
-        // Function to check session initially
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                router.push('/login'); // Redirect to login if no session
+                router.push('/login');
             } else {
                 setUser(session.user);
             }
         };
 
-        // Listen for changes in auth state (session)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (!session) {
-                router.push('/login'); // Redirect to login if no session on state change
+                router.push('/login');
             } else {
                 setUser(session.user);
             }
         });
 
-        checkSession(); // Initial session check on page load
+        checkSession();
 
-        // Cleanup: Unsubscribe from auth state changes on component unmount
         return () => {
             if (subscription) {
-                subscription.unsubscribe(); // Unsubscribe correctly
+                subscription.unsubscribe();
             }
         };
     }, [router]);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        router.push('/login'); // Redirect to login after logout
+        router.push('/login');
     };
 
     return (
@@ -62,8 +62,8 @@ export default function Dashboard() {
                     <ul>
                         <li className="mb-4">
                             <button
-                                onClick={() => router.push('/dashboard/manage-tours')}
-                                className="flex items-center text-lg text-gray-300 hover:bg-blue-500 hover:text-white p-2 rounded-full"
+                                onClick={() => setActiveSection('tours')}
+                                className={`flex items-center text-lg text-gray-300 ${activeSection === 'tours' ? 'bg-blue-500 text-white' : 'hover:bg-blue-500 hover:text-white'} p-2 rounded-full`}
                             >
                                 <MapPin size={24} />
                                 {!isCollapsed && <span className="ml-2">Manage Tours</span>}
@@ -71,8 +71,8 @@ export default function Dashboard() {
                         </li>
                         <li className="mb-4">
                             <button
-                                onClick={() => router.push('/dashboard/manage-guides')}
-                                className="flex items-center text-lg text-gray-300 hover:bg-blue-500 hover:text-white p-2 rounded-full"
+                                onClick={() => setActiveSection('guides')}
+                                className={`flex items-center text-lg text-gray-300 ${activeSection === 'guides' ? 'bg-blue-500 text-white' : 'hover:bg-blue-500 hover:text-white'} p-2 rounded-full`}
                             >
                                 <User size={24} />
                                 {!isCollapsed && <span className="ml-2">Manage Guides</span>}
@@ -84,7 +84,7 @@ export default function Dashboard() {
                 {/* Profile Button */}
                 <li className="mb-4">
                     <button
-                        onClick={() => router.push('/dashboard/settings')}
+                        onClick={() => setActiveSection('profile')}
                         className="flex items-center text-lg text-gray-300 hover:bg-blue-500 hover:text-white p-2 rounded-full"
                     >
                         <UserCircle size={24} />
@@ -114,10 +114,41 @@ export default function Dashboard() {
 
             {/* Main Content */}
             <div className="flex-1 p-8 bg-white">
-                <h1 className="text-2xl font-bold text-gray-800">Welcome to the Dashboard</h1>
-                <p className="mt-4 text-gray-600">Hello, {user?.email}!</p>
-                <p className="mt-2 text-gray-500">You can manage tours and guides from the sidebar.</p>
+                {/* Conditionally render the welcome message or the tables */}
+                {activeSection === null ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                        <h1 className="text-4xl font-semibold text-gray-800 mb-4 text-center">Welcome to the Back Office Dashboard</h1>
+                        <p className="mt-2 text-xl text-gray-600 text-center">Hello, {user?.email}!</p>
+                        <p className="mt-4 text-lg text-gray-500 text-center">You can manage your tours and guides from here</p>
+                        
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {/* Manage Tours */}
+                        {activeSection === 'tours' && (
+                            <div className="bg-white shadow-lg rounded-lg p-6">
+                                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Manage Tours</h2>
+                                <ManageTours />
+                            </div>
+                        )}
+                        {/* Manage Guides */}
+                        {activeSection === 'guides' && (
+                            <div className="bg-white shadow-lg rounded-lg p-6">
+                                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Manage Guides</h2>
+                                <ManageGuides />
+                            </div>
+                        )}
+                        {/* Profile Settings */}
+                        {activeSection === 'profile' && (
+                            <div className="bg-white shadow-lg rounded-lg p-6">
+                                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Profile Settings</h2>
+                                {/* Profile settings content */}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+
         </div>
     );
 }
