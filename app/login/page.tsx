@@ -12,25 +12,27 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetMessage, setResetMessage] = useState<string | null>(null);
+    const [showResetPopup, setShowResetPopup] = useState(false);
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true); // shows loading while request is in progress
+        setLoading(true);
         setError(null);
 
         try {
-            const { error: authError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
             if (authError) {
                 setError(authError.message);
             } else {
-                router.push('/dashboard'); // Redirect after successful login
+                setEmail('');
+                setPassword('');
+                router.push('/dashboard');
             }
-        } catch (err) {
+        } catch {
             setError('An unexpected error occurred.');
         } finally {
             setLoading(false);
@@ -39,16 +41,29 @@ export default function Login() {
 
     const handleGoogleLogin = async () => {
         try {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-            });
-            if (error) {
-                setError(error.message);
-            }
-        } catch (err) {
+            const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+            if (error) setError(error.message);
+        } catch {
             setError('An unexpected error occurred.');
         }
     };
+
+    const handlePasswordReset = async () => {
+        setResetMessage(null);
+        if (!resetEmail) return setResetMessage('Please enter your email.');
+    
+        const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+            redirectTo: `http://localhost:3000/reset-password`,
+        });
+    
+        if (error) {
+            setResetMessage(error.message);
+        } else {
+            setResetMessage('Password reset link sent! Check your email.');
+            setShowResetPopup(false);
+        }
+    };
+    
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-900">
@@ -62,6 +77,7 @@ export default function Login() {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="new-email"
                         className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
@@ -71,6 +87,7 @@ export default function Login() {
                             placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="new-password"
                             className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button
@@ -92,9 +109,13 @@ export default function Login() {
 
                     {/* Forgot Password */}
                     <div className="text-center mt-4">
-                        <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                        <button
+                            type="button"
+                            onClick={() => setShowResetPopup(true)}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
                             Forgot Password?
-                        </a>
+                        </button>
                     </div>
                 </form>
 
@@ -109,6 +130,37 @@ export default function Login() {
                     </button>
                 </div>
             </div>
+
+            {/* Forgot Password Popup */}
+            {showResetPopup && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white w-96">
+                        <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
+                        {resetMessage && <p className="text-center mb-3">{resetMessage}</p>}
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <div className="flex justify-end mt-4 space-x-3">
+                            <button
+                                onClick={() => setShowResetPopup(false)}
+                                className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handlePasswordReset}
+                                className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700"
+                            >
+                                Send Reset Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
