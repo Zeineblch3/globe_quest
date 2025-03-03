@@ -84,8 +84,6 @@ const ResetPassword = () => {
 
 export default function Page() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ResetPassword />
-        </Suspense>
+        <ResetPassword />
     );
 }
