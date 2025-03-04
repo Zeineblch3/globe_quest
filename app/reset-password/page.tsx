@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supbase';
+import { Suspense } from 'react';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -13,10 +14,18 @@ const ResetPassword = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const token = searchParams.get('access_token');
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get('access_token');
+    const expiresAt = hashParams.get('expires_at');
+
     if (!token) {
       setError('Invalid or expired reset link.');
+      return;
+    }
+
+    if (expiresAt && Number(expiresAt) * 1000 <= Date.now()) {
+      setError('The reset link has expired.');
+      return;
     }
   }, []);
 
@@ -32,8 +41,20 @@ const ResetPassword = () => {
       return;
     }
 
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get('access_token');
+
+    if (!token) {
+      setError('Invalid or expired token.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.updateUser ({ password });
+      const { data, error } = await supabase.auth.updateUser({
+        password,
+      });
+
       if (error) {
         setError(error.message);
       } else {
