@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supbase';
 
@@ -19,8 +19,6 @@ const ResetPassword = () => {
       setError('Invalid or expired reset link.');
     }
   }, []);
-  
-
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +33,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser ({ password });
       if (error) {
         setError(error.message);
       } else {
@@ -83,4 +81,10 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+const ResetPasswordWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ResetPassword />
+  </Suspense>
+);
+
+export default ResetPasswordWrapper;
