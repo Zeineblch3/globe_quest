@@ -17,6 +17,6 @@ npm run dev
 
 ```
 
-Open [Live_Demo](https://globe-quest-k6eknxwdi-zeinebs-projects-e42358d9.vercel.app/login) to see the result.
+Open [Live_Demo](https://globe-quest-lime.vercel.app/globe) to see the result.
 
 
