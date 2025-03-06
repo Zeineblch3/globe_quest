@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Html, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { supabase } from '@/lib/supbase';
+import { useFrame, useThree } from '@react-three/fiber';
 
 // Convert Lat/Lon to 3D Coordinates
 const toCartesian = (lat: number, lon: number, radius: number) => {
@@ -23,14 +24,16 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
 }) => {
   const { scene } = useGLTF('/models/scene.gltf'); // Load 3D globe model
   const globeRef = useRef<THREE.Group>(null);
+  const pinsRef = useRef<THREE.Mesh[]>([]);
   const [tours, setTours] = useState<any[]>([]);
   const [selectedTour, setSelectedTour] = useState<any>(null);
+  const { camera } = useThree(); // Move inside the component
 
   useEffect(() => {
     const fetchTours = async () => {
       const { data, error } = await supabase
         .from('tours')
-        .select('id, name, description, photo_url,tripAdvisor_link, latitude, longitude');
+        .select('id, name, description, photo_url, tripAdvisor_link, latitude, longitude');
 
       if (error) console.error('Error fetching tours:', error);
       else setTours(data);
@@ -39,6 +42,19 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
     fetchTours();
   }, []);
 
+  // Scale pins dynamically based on camera zoom
+  useFrame(() => {
+    if (!camera) return;
+    const distance = camera.position.length(); // Get camera distance from origin
+    const baseSize = 0.3; // Increased base size
+    const minSize = 0.03; // Minimum pin size when zoomed in
+    const scaleFactor = Math.max(minSize, baseSize * (distance / 10)); // Adjust scaling based on zoom
+
+    pinsRef.current.forEach((pin) => {
+      if (pin) pin.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    });
+  });
+
   return (
     <>
       <group ref={globeRef}>
@@ -46,7 +62,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
         <primitive object={scene} scale={scale} position={position} rotation={[0, 1.2, 0]} />
 
         {/* 3D Tour Pins */}
-        {tours.map((tour) => {
+        {tours.map((tour, index) => {
           const radius = 2.5; // Adjusted for the globe size
           const { x, y, z } = toCartesian(tour.latitude, tour.longitude, radius);
 
@@ -54,13 +70,16 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
             <mesh
               key={tour.id}
               position={[x, y, z]}
+              ref={(el) => {
+                if (el) pinsRef.current[index] = el;
+              }}
               rotation={[-Math.PI, 0, 0]}
               onPointerDown={(event) => {
                 event.stopPropagation();
                 setSelectedTour(tour);
               }}
             >
-              <coneGeometry args={[0.006, 0.02, 32]} />
+              <coneGeometry args={[0.2, 0.8, 32]} /> {/* Increased initial size */}
               <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
             </mesh>
           );
@@ -112,7 +131,6 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
           </div>
         </Html>
       )}
-
     </>
   );
 };
