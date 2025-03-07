@@ -44,11 +44,11 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
 
   // Scale pins dynamically based on camera zoom
   useFrame(() => {
-    if (!camera) return;
-    const distance = camera.position.length(); // Get camera distance from origin
-    const baseSize = 0.3; // Increased base size
-    const minSize = 0.03; // Minimum pin size when zoomed in
-    const scaleFactor = Math.max(minSize, baseSize * (distance / 10)); // Adjust scaling based on zoom
+    if (!pinsRef.current.length) return;
+
+    const distance = camera.position.length(); // Distance from globe
+    const baseSize = 0.1; // Bigger base size to ensure visibility
+    const scaleFactor = Math.max(0.02, baseSize * (distance / 5)); // Prevent scaling to 0
 
     pinsRef.current.forEach((pin) => {
       if (pin) pin.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -92,7 +92,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
             className="bg-white p-4 rounded-xl shadow-lg text-center"
             style={{
               width: '500px',
-              height: '400px',
+              height: '500px',
               overflowY: 'auto',
               pointerEvents: 'auto', // Ensure pointer events are enabled
               zIndex: 1000, // Ensure the popup is on top
@@ -103,7 +103,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
               <img
                 src={selectedTour.photo_url}
                 alt={selectedTour.name}
-                className="w-full h-32 object-cover rounded-lg mb-4"
+                className="w-full h-60 object-cover rounded-lg mb-4"
               />
             )}
             <p className="text-gray-700 mb-4">
