@@ -15,7 +15,7 @@ const GlobePage: React.FC = () => {
   
 
   const handleOpenBook = () => {
-    window.open('https://your-url-here.com', '_blank');
+    window.open('https://risper-catalogue.vercel.app/', '_blank');
   };
 
   return (
