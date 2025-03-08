@@ -27,13 +27,14 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
   const pinsRef = useRef<THREE.Mesh[]>([]);
   const [tours, setTours] = useState<any[]>([]);
   const [selectedTour, setSelectedTour] = useState<any>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Index for current image
   const { camera } = useThree(); // Move inside the component
 
   useEffect(() => {
     const fetchTours = async () => {
       const { data, error } = await supabase
         .from('tours')
-        .select('id, name, description, photo_url, tripAdvisor_link, latitude, longitude');
+        .select('id, name, description, photo_urls, tripAdvisor_link, latitude, longitude, price'); // Ensure price is included
 
       if (error) console.error('Error fetching tours:', error);
       else setTours(data);
@@ -41,6 +42,20 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
 
     fetchTours();
   }, []);
+
+  const handleNextImage = () => {
+    if (selectedTour && selectedTour.photo_urls) {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % selectedTour.photo_urls.length);
+    }
+  };
+
+  const handlePrevImage = () => {
+    if (selectedTour && selectedTour.photo_urls) {
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex - 1 + selectedTour.photo_urls.length) % selectedTour.photo_urls.length
+      );
+    }
+  };
 
   // Scale pins dynamically based on camera zoom
   useFrame(() => {
@@ -77,6 +92,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
               onPointerDown={(event) => {
                 event.stopPropagation();
                 setSelectedTour(tour);
+                setCurrentImageIndex(0); // Reset to the first image
               }}
             >
               <coneGeometry args={[0.2, 0.8, 32]} /> {/* Increased initial size */}
@@ -86,26 +102,59 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
         })}
       </group>
 
-      {selectedTour && (
+      {selectedTour && selectedTour.photo_urls && (
         <Html position={[0, 0, 0]} center>
           <div
-            className="bg-white p-4 rounded-xl shadow-lg text-center"
+            className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-500"
             style={{
               width: '500px',
-              height: '500px',
+              height: '600px',
               overflowY: 'auto',
               pointerEvents: 'auto', // Ensure pointer events are enabled
               zIndex: 1000, // Ensure the popup is on top
             }}
           >
             <h3 className="text-xl font-bold text-gray-900 mb-4">{selectedTour.name}</h3>
-            {selectedTour.photo_url && (
-              <img
-                src={selectedTour.photo_url}
-                alt={selectedTour.name}
-                className="w-full h-60 object-cover rounded-lg mb-4"
-              />
-            )}
+            
+            {/* Image carousel */}
+            <div className="relative w-full overflow-hidden">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{
+                  transform: `translateX(-${currentImageIndex * 100}%)`, // Move the images horizontally
+                }}
+              >
+                {selectedTour.photo_urls.map((url: string, index: number) => (
+                  <div key={index} className="flex-shrink-0 w-full mx-1"> {/* Added margin */}
+                    <img
+                      src={url}
+                      alt={`${selectedTour.name} image ${index}`}
+                      className="w-full h-60 object-cover rounded-lg mb-4"
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Left arrow */}
+              <button
+                onClick={handlePrevImage}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-gray-300 bg-opacity-5 text-gray-800 flex items-center justify-center backdrop-blur-sm hover:bg-gray-500 hover:bg-opacity-70 hover:text-white transition duration-300"
+              >
+                &lt;
+              </button>
+
+              {/* Right arrow */}
+              <button
+                onClick={handleNextImage}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-gray-300 bg-opacity-30 text-gray-800 flex items-center justify-center backdrop-blur-sm hover:bg-gray-500 hover:bg-opacity-70 hover:text-white transition duration-300"
+              >
+                &gt;
+              </button>
+
+            </div>
+
+            {/* Price display */}
+            <h3 className="text-xl font-bold text-gray-900 mb-4">${selectedTour.price}</h3>
+
             <p className="text-gray-700 mb-4">
               <a
                 href={selectedTour.tripAdvisor_link}

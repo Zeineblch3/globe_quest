@@ -21,7 +21,7 @@ export default function ManageTours() {
     const [description, setDescription] = useState('');
     const [latitude, setLatitude] = useState<number | string>(''); 
     const [longitude, setLongitude] = useState<number | string>(''); 
-    const [photoUrl, setPhotoUrl] = useState('');
+    const [photoUrls, setPhotoUrls] = useState<string[]>([]); // Changed to an array
     const [price, setPrice] = useState<number | string>(''); 
     const [tripAdvisor_link, setTripAdvisor_link] = useState('');
 
@@ -41,6 +41,7 @@ export default function ManageTours() {
     const openAddModal = () => {
         setShowModal(true);
         setIsEditing(false);
+        setPhotoUrls([]); // Reset photoUrls when adding a new tour
     };
 
     const openEditModal = (tour: any) => {
@@ -51,7 +52,7 @@ export default function ManageTours() {
         setDescription(tour.description);
         setLatitude(tour.latitude);
         setLongitude(tour.longitude);
-        setPhotoUrl(tour.photo_url || '');
+        setPhotoUrls(tour.photo_urls || []); // Set the existing photo URLs
         setPrice(tour.price);
         setTripAdvisor_link(tour.tripAdvisor_link || '');
     };
@@ -67,7 +68,7 @@ export default function ManageTours() {
         setDescription('');
         setLatitude('');
         setLongitude('');
-        setPhotoUrl('');
+        setPhotoUrls([]); // Clear the photo URLs array
         setPrice('');
         setTripAdvisor_link('');
         setPhotoUrlError('');
@@ -83,14 +84,18 @@ export default function ManageTours() {
 
         let valid = true;
 
-        // Check if photoUrl is empty before validating
-        if (!photoUrl) {
-            setPhotoUrlError('Photo URL cannot be empty.');
-            valid = false;
-        } else if (!isValidUrl(photoUrl)) {
-            setPhotoUrlError('Please enter a valid URL.');
+        if (photoUrls.length === 0) {
+            setPhotoUrlError('At least one photo URL must be provided.');
             valid = false;
         }
+
+        // Validate each URL in the photoUrls array
+        photoUrls.forEach((url) => {
+            if (!isValidUrl(url)) {
+                setPhotoUrlError('Please enter valid URLs.');
+                valid = false;
+            }
+        });
 
         if (tripAdvisor_link && !isValidUrl(tripAdvisor_link)) {
             setTripAdvisorLinkError('Please enter a valid URL.');
@@ -104,7 +109,7 @@ export default function ManageTours() {
             description, 
             latitude: parseFloat(latitude as string) || 0, 
             longitude: parseFloat(longitude as string) || 0, 
-            photo_url: photoUrl, 
+            photo_urls: photoUrls,  // Store the photo URLs as an array
             price: parseFloat(price as string) || 0, 
             tripAdvisor_link: tripAdvisor_link 
         };
@@ -133,14 +138,18 @@ export default function ManageTours() {
 
         let valid = true;
 
-        // Check if photoUrl is empty before validating
-        if (!photoUrl) {
-            setPhotoUrlError('Photo URL cannot be empty.');
-            valid = false;
-        } else if (!isValidUrl(photoUrl)) {
-            setPhotoUrlError('Please enter a valid URL.');
+        if (photoUrls.length === 0) {
+            setPhotoUrlError('At least one photo URL must be provided.');
             valid = false;
         }
+
+        // Validate each URL in the photoUrls array
+        photoUrls.forEach((url) => {
+            if (!isValidUrl(url)) {
+                setPhotoUrlError('Please enter valid URLs.');
+                valid = false;
+            }
+        });
 
         if (tripAdvisor_link && !isValidUrl(tripAdvisor_link)) {
             setTripAdvisorLinkError('Please enter a valid URL.');
@@ -149,9 +158,17 @@ export default function ManageTours() {
 
         if (!valid) return;
 
-        const updatedTour = { name, description, latitude, longitude, photo_url: photoUrl, price, tripAdvisor_link: tripAdvisor_link };
+        const updatedTour = { 
+            name, 
+            description, 
+            latitude: parseFloat(latitude as string) || 0, 
+            longitude: parseFloat(longitude as string) || 0, 
+            photo_urls: photoUrls,  // Update the photo_urls array
+            price: parseFloat(price as string) || 0, 
+            tripAdvisor_link: tripAdvisor_link 
+        };
         try {
-            const { error } = await supabase.from('tours').update(updatedTour).eq('id', editingTour.id);
+            const { error } = await supabase.from('tours').update(updatedTour ).eq('id', editingTour.id);
             if (error) throw error;
             fetchTours();
             closeModal();
@@ -170,6 +187,11 @@ export default function ManageTours() {
                 console.error('Error deleting tour:', error);
             }
         }
+    };
+
+    // Add new photo URL to the list
+    const addPhotoUrl = () => {
+        setPhotoUrls([...photoUrls, '']); // Add an empty string for a new URL
     };
 
     return (
@@ -198,10 +220,12 @@ export default function ManageTours() {
                                 <td className="px-6 py-3 text-gray-800">{tour.latitude}</td>
                                 <td className="px-6 py-3 text-gray-800">{tour.longitude}</td>
                                 <td className="px-6 py-3">
-                                    {tour.photo_url ? (
-                                        <img src={tour.photo_url} alt="Tour" className="h-12 w-12 rounded object-cover" />
+                                    {tour.photo_urls && tour.photo_urls.length > 0 ? (
+                                        tour.photo_urls.map((url: string, index: number) => (
+                                            <img key={index} src={url} alt="Tour" className="h-12 w-12 rounded object-cover mr-2" />
+                                        ))
                                     ) : (
-                                        'No Photo'
+                                        'No Photos'
                                     )}
                                 </td>
                                 <td className="px-6 py-3 text-gray-800">${tour.price}</td>
@@ -229,40 +253,122 @@ export default function ManageTours() {
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
                     <div className="bg-white p-6 rounded-xl shadow-lg w-1/3 max-h-[80vh] overflow-auto text-gray-800">
                         <h3 className="text-xl font-semibold">{isEditing ? 'Edit Tour' : 'Add Tour'}</h3>
-                        <form onSubmit={isEditing ? handleUpdateTour : handleCreateTour} className="space-y-4 mt-4">
+                        <form onSubmit={isEditing ? handleUpdateTour : handleCreateTour} className="space-y-4">
                             <div>
-                                <label htmlFor="name" className="block font-medium">Tour Name</label>
-                                <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" required />
+                                <label htmlFor="name" className="block">Name</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                    className="w-full border p -2 rounded"
+                                />
                             </div>
+
                             <div>
-                                <label htmlFor="description" className="block font-medium">Description</label>
-                                <input type="text" id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" required />
+                                <label htmlFor="description" className="block">Description</label>
+                                <textarea
+                                    id="description"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    required
+                                    className="w-full border p-2 rounded"
+                                />
                             </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="latitude" className="block">Latitude</label>
+                                    <input
+                                        type="number"
+                                        id="latitude"
+                                        value={latitude}
+                                        onChange={(e) => setLatitude(e.target.value)}
+                                        required
+                                        className="w-full border p-2 rounded"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="longitude" className="block">Longitude</label>
+                                    <input
+                                        type="number"
+                                        id="longitude"
+                                        value={longitude}
+                                        onChange={(e) => setLongitude(e.target.value)}
+                                        required
+                                        className="w-full border p-2 rounded"
+                                    />
+                                </div>
+                            </div>
+
                             <div>
-                                <label htmlFor="latitude" className="block font-medium">Latitude</label>
-                                <input type="text" id="latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" />
+                                <label htmlFor="photoUrls" className="block">Photo URLs</label>
+                                <div className="space-y-2">
+                                    {photoUrls.map((url, index) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                            <input
+                                                type="text"
+                                                value={url}
+                                                onChange={(e) => {
+                                                    const updatedUrls = [...photoUrls];
+                                                    updatedUrls[index] = e.target.value;
+                                                    setPhotoUrls(updatedUrls);
+                                                }}
+                                                className="flex-1 border p-2 rounded"
+                                            />
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={addPhotoUrl}
+                                        className="text-blue-500 hover:text-blue-700"
+                                    >
+                                        + Add Another Photo URL
+                                    </button>
+                                </div>
+                                {photoUrlError && <p className="text-red-600 text-sm">{photoUrlError}</p>}
                             </div>
+
                             <div>
-                                <label htmlFor="longitude" className="block font-medium">Longitude</label>
-                                <input type="text" id="longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" />
+                                <label htmlFor="price" className="block">Price</label>
+                                <input
+                                    type="number"
+                                    id="price"
+                                    value={price}
+                                    onChange={(e) => setPrice(e.target.value)}
+                                    required
+                                    className="w-full border p-2 rounded"
+                                />
                             </div>
+
                             <div>
-                                <label htmlFor="photoUrl" className="block font-medium">Photo URL</label>
-                                <input type="text" id="photoUrl" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" />
-                                {photoUrlError && <p className="text-red-500 text-sm">{photoUrlError}</p>}
+                                <label htmlFor="tripAdvisor_link" className="block">TripAdvisor Link</label>
+                                <input
+                                    type="text"
+                                    id="tripAdvisor_link"
+                                    value={tripAdvisor_link}
+                                    onChange={(e) => setTripAdvisor_link(e.target.value)}
+                                    className="w-full border p-2 rounded"
+                                />
+                                {tripAdvisorLinkError && <p className="text-red-600 text-sm">{tripAdvisorLinkError}</p>}
                             </div>
-                            <div>
-                                <label htmlFor="price" className="block font-medium">Price</label>
-                                <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" />
-                            </div>
-                            <div>
-                                <label htmlFor="tripAdvisor_link" className="block font-medium">TripAdvisor Link</label>
-                                <input type="text" id="tripAdvisor_link" value={tripAdvisor_link} onChange={(e) => setTripAdvisor_link(e.target.value)} className="mt-1 p-2 border rounded w-full text-gray-900" />
-                                {tripAdvisorLinkError && <p className="text-red-500 text-sm">{tripAdvisorLinkError}</p>}
-                            </div>
-                            <div className="flex justify-end space-x-2 mt-4">
-                                <button type="button" onClick={closeModal} className="bg-gray-500 text-white p-2 rounded">Cancel</button>
-                                <button type="submit" className="bg-blue-500 text-white p-2 rounded">{isEditing ? 'Update Tour' : 'Add Tour'}</button>
+
+                            <div className="flex justify-between space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="bg-gray-400 text-white p-2 rounded"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-500 text-white p-2 rounded"
+                                >
+                                    {isEditing ? 'Update Tour' : 'Create Tour'}
+                                </button>
                             </div>
                         </form>
                     </div>
