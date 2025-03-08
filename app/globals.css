@@ -22,3 +22,65 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+@keyframes backgroundMove {
+  0% { background-position: 30% 90%; }
+  10% { background-position: 50% 30%; }
+  20% { background-position: 70% 60%; }
+  30% { background-position: 20% 40%; }
+  40% { background-position: 60% 10%; }
+  50% { background-position: 80% 50%; }
+  60% { background-position: 30% 80%; }
+  70% { background-position: 90% 20%; }
+  80% { background-position: 40% 70%; }
+  90% { background-position: 10% 10%; }
+  100% { background-position: 50% 90%; }
+}
+
+.animated-bg {
+  background: linear-gradient(to top, #182230, #0c1b30, #000000);
+  background-size: 400% 400%;
+  animation: backgroundMove 30s ease-in-out infinite alternate;
+  position: relative; /* To position stars absolutely inside the container */
+  overflow: hidden; /* Hide any stars that overflow */
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Prevent stars from interfering with other elements */
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: moveStars 100s infinite linear;
+}
+
+@keyframes moveStars {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(100vw, 100vh);
+  }
+}
+
+/* Star size and movement speeds */
+.stars .star:nth-child(odd) {
+  width: 2px;
+  height: 2px;
+  animation-duration: 60s;
+}
+
+.stars .star:nth-child(even) {
+  width: 3px;
+  height: 3px;
+  animation-duration: 80s;
+}
