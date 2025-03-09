@@ -252,7 +252,7 @@ export default function ManageTours() {
             {showModal && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
                     <div className="bg-white p-6 rounded-xl shadow-lg w-1/3 max-h-[80vh] overflow-auto text-gray-800">
-                        <h3 className="text-xl font-semibold">{isEditing ? 'Edit Tour' : 'Add Tour'}</h3>
+                        <h3 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Tour' : 'Add Tour'}</h3>
                         <form onSubmit={isEditing ? handleUpdateTour : handleCreateTour} className="space-y-4">
                             <div>
                                 <label htmlFor="name" className="block">Name</label>
@@ -262,7 +262,7 @@ export default function ManageTours() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
-                                    className="w-full border p -2 rounded"
+                                    className="mt-1 p-2 border rounded w-full text-gray-900"
                                 />
                             </div>
 
@@ -273,7 +273,7 @@ export default function ManageTours() {
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     required
-                                    className="w-full border p-2 rounded"
+                                    className="mt-1 p-2 border rounded w-full text-gray-900"
                                 />
                             </div>
 
@@ -286,7 +286,7 @@ export default function ManageTours() {
                                         value={latitude}
                                         onChange={(e) => setLatitude(e.target.value)}
                                         required
-                                        className="w-full border p-2 rounded"
+                                        className="mt-1 p-2 border rounded w-full text-gray-900"
                                     />
                                 </div>
 
@@ -298,7 +298,7 @@ export default function ManageTours() {
                                         value={longitude}
                                         onChange={(e) => setLongitude(e.target.value)}
                                         required
-                                        className="w-full border p-2 rounded"
+                                        className="mt-1 p-2 border rounded w-full text-gray-900"
                                     />
                                 </div>
                             </div>
@@ -316,7 +316,7 @@ export default function ManageTours() {
                                                     updatedUrls[index] = e.target.value;
                                                     setPhotoUrls(updatedUrls);
                                                 }}
-                                                className="flex-1 border p-2 rounded"
+                                                className="mt-1 p-2 border rounded w-full text-gray-900"
                                             />
                                         </div>
                                     ))}
@@ -339,7 +339,7 @@ export default function ManageTours() {
                                     value={price}
                                     onChange={(e) => setPrice(e.target.value)}
                                     required
-                                    className="w-full border p-2 rounded"
+                                    className="mt-1 p-2 border rounded w-full text-gray-900"
                                 />
                             </div>
 
@@ -350,7 +350,7 @@ export default function ManageTours() {
                                     id="tripAdvisor_link"
                                     value={tripAdvisor_link}
                                     onChange={(e) => setTripAdvisor_link(e.target.value)}
-                                    className="w-full border p-2 rounded"
+                                    className="mt-1 p-2 border rounded w-full text-gray-900"
                                 />
                                 {tripAdvisorLinkError && <p className="text-red-600 text-sm">{tripAdvisorLinkError}</p>}
                             </div>

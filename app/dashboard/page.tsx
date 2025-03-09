@@ -6,11 +6,12 @@ import { supabase } from '@/lib/supbase';
 import { ChevronLeft, ChevronRight, MapPin, User, LogOutIcon, Settings, UserCircle } from 'lucide-react';
 import ManageTours from './manage-tours';
 import ManageGuides from './manage-guides';
+import Profil from './Profil';
 
 export default function Dashboard() {
     const [user, setUser] = useState<any>(null); // Define user type as needed
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | null>(null); // Set initial state to null
+    const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | 'setting' | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -97,7 +98,7 @@ export default function Dashboard() {
                 {/* Settings Button */}
                 <li className="mb-4">
                     <button
-                        onClick={() => router.push('/dashboard/settings')}
+                        onClick={() => setActiveSection('setting')}
                         className="flex items-center text-lg text-gray-300 hover:bg-blue-500 hover:text-white p-2 rounded-full"
                     >
                         <Settings size={24} />
@@ -144,7 +145,14 @@ export default function Dashboard() {
                         {activeSection === 'profile' && (
                             <div className="bg-white shadow-lg rounded-lg p-6">
                                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Profile Settings</h2>
-                                {/* Profile settings content */}
+                                <Profil />
+                            </div>
+                        )}
+
+                        {/* Preferences Settings */}
+                        {activeSection === 'setting' && (
+                            <div className="bg-white shadow-lg rounded-lg p-6">
+                                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Preferences Settings</h2>
                             </div>
                         )}
                     </div>
