@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import Globe from '../components/Globe';
-import { FaMap, FaBook, FaUser } from 'react-icons/fa';
+import { FaMap, FaBook, FaUser, FaCloudSun} from 'react-icons/fa';
 import { Canvas } from '@react-three/fiber';
 
 const GlobePage: React.FC = () => {
@@ -78,9 +78,9 @@ const GlobePage: React.FC = () => {
         </div>
         <div className="relative group">
           <button className="p-3 bg-gray-800 rounded-full shadow-md hover:bg-gray-700">
-            <FaUser className="text-white text-xl" />
+            <FaCloudSun className="text-white text-2xl" />
           </button>
-          <span className="absolute right-full mr-3 px-4 py-2 text-lg text-white bg-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Profil</span>
+          <span className="absolute right-full mr-3 px-4 py-2 text-lg text-white bg-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Weather</span>
         </div>
       </div>
     </div>
