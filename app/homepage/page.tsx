@@ -3,8 +3,9 @@
 import React, { useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import Globe from '../components/Globe';
-import { FaMap, FaBook, FaUser, FaCloudSun} from 'react-icons/fa';
+import { FaMap, FaBook, FaCloudSun} from 'react-icons/fa';
 import { Canvas } from '@react-three/fiber';
+import Stars from './Stars';
 
 const GlobePage: React.FC = () => {
   const controlsRef = useRef(null);
@@ -20,12 +21,7 @@ const GlobePage: React.FC = () => {
 
   return (
     <div className="relative w-full h-screen flex flex-col text-white animated-bg">
-      <div className="stars">
-        {/* Generate multiple stars */}
-        {[...Array(100)].map((_, i) => (
-          <div key={i} className="star" style={{ animationDelay: `${Math.random() * 5}s`, left: `${Math.random() * 100}vw`, top: `${Math.random() * 100}vh` }}></div>
-        ))}
-      </div>
+      <Stars />
       {/* Header Navigation */}
       <header className="absolute top-0 left-0 w-full flex justify-between items-center p-6 z-20">
         {/* Logo */}

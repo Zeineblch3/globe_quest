@@ -8,7 +8,7 @@ export default function Home() {
 
   useEffect(() => {
     // Always redirect to the login page
-    router.replace('/globe');
+    router.replace('/homepage');
   }, [router]);
 
   return null;
