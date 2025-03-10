@@ -14,20 +14,22 @@ const ResetPassword = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const token = hashParams.get('access_token');
-    const expiresAt = hashParams.get('expires_at');
-
+    // Get the URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('access_token');
+    const expiresAt = urlParams.get('expires_at');
+  
     if (!token) {
       setError('Invalid or expired reset link.');
       return;
     }
-
+  
     if (expiresAt && Number(expiresAt) * 1000 <= Date.now()) {
       setError('The reset link has expired.');
       return;
     }
   }, []);
+  
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password,
       });
 

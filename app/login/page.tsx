@@ -3,66 +3,52 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { supabase } from '@/lib/supbase';
+import { loginWithEmail, loginWithGoogle, resetPassword } from '../Services/authService';
 import Image from 'next/image';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [resetEmail, setResetEmail] = useState('');
-    const [resetMessage, setResetMessage] = useState<string | null>(null);
-    const [showResetPopup, setShowResetPopup] = useState(false);
-    const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [showResetPopup, setShowResetPopup] = useState(false);
+  const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-        try {
-            const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const loginError = await loginWithEmail(email, password);
 
-            if (authError) {
-                setError(authError.message);
-            } else {
-                setEmail('');
-                setPassword('');
-                router.push('/dashboard');
-            }
-        } catch {
-            setError('An unexpected error occurred.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    if (loginError) {
+      setError(loginError);
+    } else {
+      setEmail('');
+      setPassword('');
+      router.push('/dashboard');
+    }
 
-    const handleGoogleLogin = async () => {
-        try {
-            const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-            if (error) setError(error.message);
-        } catch {
-            setError('An unexpected error occurred.');
-        }
-    };
+    setLoading(false);
+  };
 
-    const handlePasswordReset = async () => {
-        setResetMessage(null);
-        if (!resetEmail) return setResetMessage('Please enter your email.');
-    
-        const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-            redirectTo: `http://localhost:3000/reset-password`,
-        });
-    
-        if (error) {
-            setResetMessage(error.message);
-        } else {
-            setResetMessage('Password reset link sent! Check your email.');
-            setShowResetPopup(false);
-        }
-    };
+  const handleGoogleLogin = async () => {
+    const googleError = await loginWithGoogle();
+    if (googleError) setError(googleError);
+  };
+
+  const handlePasswordReset = async () => {
+    setResetMessage(null);
+    if (!resetEmail) return setResetMessage('Please enter your email.');
+
+    const resetError = await resetPassword(resetEmail);
+
+    setResetMessage(resetError || 'Password reset link sent! Check your email.');
+    if (!resetError) setShowResetPopup(false);
+  };
     
 
     return (
