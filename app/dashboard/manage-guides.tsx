@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supbase';
 
 export default function ManageGuides() {
@@ -208,7 +208,9 @@ export default function ManageGuides() {
 
     return (
         <div>
-            <button onClick={openAddModal} className="mt-4 p-2 bg-blue-500 text-white rounded">Add New Guide</button>
+            <button onClick={openAddModal} className="mt-4 p-2 bg-black text-white rounded flex items-center">
+                <Plus size={20} className="mr-2" /> Add New Guide
+            </button>
 
             <div className="overflow-x-auto">
                 <table className="mt-6 w-full table-auto border-collapse">
