@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Archive, Edit, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supbase';
 import TourSearch from './tourSearch';
+import CSVExport from './CSVExport';
 
 // URL validation helper function
 const isValidUrl = (url: string) => {
@@ -14,6 +15,8 @@ const isValidUrl = (url: string) => {
 
 export default function ManageTours() {
     const [tours, setTours] = useState<any[]>([]);
+    const [selectedTours, setSelectedTours] = useState<Set<string>>(new Set()); // Track selected tours
+
     const [showModal, setShowModal] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editingTour, setEditingTour] = useState<any | null>(null);
@@ -29,15 +32,23 @@ export default function ManageTours() {
     const [photoUrlError, setPhotoUrlError] = useState('');
     const [tripAdvisorLinkError, setTripAdvisorLinkError] = useState('');
 
+    const filteredTours = tours.filter((tour) => !tour.archived);
+
     useEffect(() => {
         fetchTours();
     }, []);
 
     const fetchTours = async () => {
-        const { data, error } = await supabase.from('tours').select('*');
-        if (error) console.error('Error fetching tours:', error);
-        else setTours(data);
-    };
+        try {
+          const { data, error } = await supabase.from('tours').select('*');
+    
+          if (error) throw error;
+    
+          setTours(data);
+        } catch (error) {
+          console.error('Error fetching tours:', error);
+        }
+      };
 
     const openAddModal = () => {
         setShowModal(true);
@@ -190,9 +201,38 @@ export default function ManageTours() {
         }
     };
 
+    const handleArchiveTour = async (tourId: string) => {
+        try {
+            // Archive the tour in the database
+            await supabase
+                .from('tours')
+                .update({ archived: true }) // Assuming `archived` is a column
+                .eq('id', tourId);
+    
+            // Remove the archived tour from the state (optimistic UI update)
+            setTours((prevTours) => prevTours.filter((tour) => tour.id !== tourId));
+        } catch (error) {
+            console.error("Error archiving tour:", error);
+        }
+    };
+      
+      
     // Add new photo URL to the list
     const addPhotoUrl = () => {
         setPhotoUrls([...photoUrls, '']); // Add an empty string for a new URL
+    };
+
+    // Handle checkbox selection
+    const handleCheckboxChange = (tourId: string) => {
+        setSelectedTours((prev) => {
+            const newSelectedTours = new Set(prev);
+            if (newSelectedTours.has(tourId)) {
+                newSelectedTours.delete(tourId);
+            } else {
+                newSelectedTours.add(tourId);
+            }
+            return newSelectedTours;
+        });
     };
 
     return (
@@ -202,11 +242,29 @@ export default function ManageTours() {
             <button onClick={openAddModal} className="mt-4 p-2 bg-black text-white rounded flex items-center">
                 <Plus size={20} className="mr-2" /> Add New Tour
             </button>
+            
+            <CSVExport
+                tours={tours.filter((tour) => selectedTours.has(tour.id))} 
+                selectedTours={selectedTours} 
+                className="p-2 bg-black text-white rounded flex items-center ml-auto"
+            />
 
             <div className="overflow-x-auto">
                 <table className="mt-6 w-full table-auto border-collapse">
                     <thead className="bg-gray-200 text-gray-700">
                         <tr>
+                        <th className="px-6 py-3 text-left">
+                                <input 
+                                    type="checkbox" 
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setSelectedTours(new Set(tours.map((tour) => tour.id)));
+                                        } else {
+                                            setSelectedTours(new Set());
+                                        }
+                                    }}
+                                />
+                            </th>
                             <th className="px-6 py-3 text-left">Name</th>
                             <th className="px-6 py-3 text-left">Description</th>
                             <th className="px-6 py-3 text-left">Latitude</th>
@@ -218,8 +276,15 @@ export default function ManageTours() {
                         </tr>
                     </thead>
                     <tbody>
-                        {tours.map((tour) => (
+                        {filteredTours.map((tour) => (
                             <tr key={tour.id} className="border-b">
+                                <td className="px-6 py-3">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={selectedTours.has(tour.id)} 
+                                        onChange={() => handleCheckboxChange(tour.id)} 
+                                    />
+                                </td>
                                 <td className="px-6 py-3 text-gray-800">{tour.name}</td>
                                 <td className="px-6 py-3 text-gray-800">{tour.description}</td>
                                 <td className="px-6 py-3 text-gray-800">{tour.latitude}</td>
@@ -238,13 +303,26 @@ export default function ManageTours() {
                                     <a href={tour.tripAdvisor_link} target="_blank" rel="noopener noreferrer">View</a>
                                 </td>
                                 <td className="px-6 py-3">
-                                    <div className="flex space-x-4">
-                                        <button onClick={() => openEditModal(tour)} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-400 transition">
+                                    <div className="flex flex-col space-y-4">
+                                        <button
+                                            onClick={() => openEditModal(tour)}
+                                            className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-400 flex items-center justify-center h-8 w-8"
+                                        >
                                             <Edit size={20} />
                                         </button>
 
-                                        <button onClick={() => handleDeleteTour(tour.id)} className="bg-red-500 text-white p-2 rounded hover:bg-red-400 transition">
+                                        <button
+                                            onClick={() => handleDeleteTour(tour.id)}
+                                            className="bg-red-500 text-white p-2 rounded hover:bg-red-400 flex items-center justify-center h-8 w-8"
+                                        >
                                             <Trash2 size={20} />
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleArchiveTour(tour.id)}
+                                            className="bg-gray-600 text-white p-2 rounded hover:bg-gray-400 flex items-center justify-center h-8 w-8"
+                                        >
+                                            <Archive size={20} />
                                         </button>
                                     </div>
                                 </td>

@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 import Profil from './Profil';
 import ManageGuides from './manage-guides';
 import ManageTours from './manage-tours';
+import ArchivedTours from './archivedTours'; // Import ArchivedTours component
 import { getSession, signOut, subscribeToAuthStateChanges } from '../Services/authService';
 import Sidebar from './Sidebar';
 
 export default function Dashboard() {
-  const [user, setUser] = useState<any>(null); // Define user type as needed
-  const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | 'setting' | null>(null);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false); // Sidebar state here
+  const [user, setUser] = useState<any>(null);
+  const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours' | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const router = useRouter();
 
-  // Function to toggle sidebar state
   const toggleSidebar = () => {
     setIsCollapsed((prevState) => !prevState);
   };
@@ -56,16 +56,16 @@ export default function Dashboard() {
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
         setActiveSection={setActiveSection}
-        handleLogout={handleLogout} activeSection={null}      
-        />
+        handleLogout={handleLogout}
+        activeSection={activeSection}
+      />
 
       {/* Main Content */}
       <div
         className={`flex-1 p-8 bg-white overflow-auto h-screen transition-all duration-300 ${
           isCollapsed ? 'ml-20' : 'ml-[256px]'
-        }`} // Adjusted margin-left based on sidebar state
+        }`}
       >
-        {/* Conditionally render the welcome message or the active section */}
         {activeSection === null ? (
           <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-4xl font-semibold text-gray-800 mb-4 text-center">
@@ -78,31 +78,33 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Manage Tours */}
             {activeSection === 'tours' && (
               <div className="bg-white shadow-lg rounded-lg p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Manage Tours</h2>
                 <ManageTours />
               </div>
             )}
-            {/* Manage Guides */}
             {activeSection === 'guides' && (
               <div className="bg-white shadow-lg rounded-lg p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Manage Guides</h2>
                 <ManageGuides />
               </div>
             )}
-            {/* Profile Settings */}
             {activeSection === 'profile' && (
               <div className="bg-white shadow-lg rounded-lg p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Profile Settings</h2>
                 <Profil />
               </div>
             )}
-            {/* Preferences Settings */}
             {activeSection === 'setting' && (
               <div className="bg-white shadow-lg rounded-lg p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Preferences Settings</h2>
+              </div>
+            )}
+            {activeSection === 'archivedTours' && (
+              <div className="bg-white shadow-lg rounded-lg p-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Archived Tours</h2>
+                <ArchivedTours tours={[]} />
               </div>
             )}
           </div>

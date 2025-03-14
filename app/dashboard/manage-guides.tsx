@@ -241,11 +241,11 @@ export default function ManageGuides() {
                                 <td className="text-gray-800 px-6 py-3">{guide.phone_number}</td>
                                 <td className="text-gray-800 px-6 py-3">{guide.email}</td>
                                 <td className="px-6 py-3">
-                                    <div className="flex space-x-4">
-                                        <button onClick={() => openEditModal(guide)} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-400 transition">
+                                    <div className="flex flex-col space-y-4">
+                                        <button onClick={() => openEditModal(guide)} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-400 flex items-center justify-center h-8 w-8">
                                             <Edit size={20} />
                                         </button>
-                                        <button onClick={() => handleDeleteGuide(guide.id)} className="bg-red-500 text-white p-2 rounded hover:bg-red-400 transition">
+                                        <button onClick={() => handleDeleteGuide(guide.id)} className="bg-red-500 text-white p-2 rounded hover:bg-red-400 flex items-center justify-center h-8 w-8">
                                             <Trash2 size={20} />
                                         </button>
                                     </div>

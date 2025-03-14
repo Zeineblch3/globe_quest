@@ -7,15 +7,16 @@ import {
   User, 
   UserCircle, 
   Settings as SettingsIcon, 
-  LogOutIcon 
+  LogOutIcon, 
+  Archive
 } from 'lucide-react';
 
 interface SidebarProps {
   isCollapsed: boolean;
   toggleSidebar: () => void;
-  setActiveSection: (section: 'tours' | 'guides' | 'profile' | 'setting' | null) => void;
+  setActiveSection: (section: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours'| null) => void;
   handleLogout: () => void;
-  activeSection: 'tours' | 'guides' | 'profile' | 'setting' | null;
+  activeSection: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours'| null;
 }
 
 const Sidebar = ({
@@ -25,7 +26,7 @@ const Sidebar = ({
   handleLogout, 
   activeSection 
 }: SidebarProps) => {
-  const handleClick = (section: 'tours' | 'guides' | 'profile' | 'setting') => {
+  const handleClick = (section: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours') => {
     setActiveSection(section);
   };
 
@@ -77,6 +78,17 @@ const Sidebar = ({
                 className={`mr-2 ${activeSection === 'guides' ? 'text-gray-800' : 'text-gray-400'}`}
               />
               {!isCollapsed && <span>Guides</span>}
+            </button>
+          </li>
+
+          {/* Archived Tours */}
+          <li className="mb-4">
+            <button
+              onClick={() => handleClick('archivedTours')}
+              className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${activeSection === 'archivedTours' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'}`}
+            >
+              <Archive size={24} className={`mr-2 ${activeSection === 'archivedTours' ? 'text-gray-800' : 'text-gray-400'}`} />
+              {!isCollapsed && <span>Archived Tours</span>}
             </button>
           </li>
         </ul>
