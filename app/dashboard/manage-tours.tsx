@@ -5,6 +5,7 @@ import { Archive, Edit, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supbase';
 import TourSearch from './tourSearch';
 import CSVExport from './CSVExport';
+import { fetchTours } from '../Services/tourService';
 
 // URL validation helper function
 const isValidUrl = (url: string) => {
@@ -35,21 +36,16 @@ export default function ManageTours() {
     const filteredTours = tours.filter((tour) => !tour.archived);
 
     useEffect(() => {
-        fetchTours();
+        const getTours = async () => {
+            const { data, error } = await fetchTours();
+            if (error) {
+                console.error('Error fetching tours:', error);
+            } else {
+                setTours(data);
+            }
+        };
+        getTours();
     }, []);
-
-    const fetchTours = async () => {
-        try {
-          const { data, error } = await supabase.from('tours').select('*');
-    
-          if (error) throw error;
-    
-          setTours(data);
-        } catch (error) {
-          console.error('Error fetching tours:', error);
-        }
-      };
-
     const openAddModal = () => {
         setShowModal(true);
         setIsEditing(false);
