@@ -22,7 +22,6 @@ const CSVExport: React.FC<CSVExportProps> = ({ tours, selectedTours, className }
             Description: tour.description,
             Latitude: tour.latitude,
             Longitude: tour.longitude,
-            'Photo URLs': tour.photo_urls.join(', '), // Join photo URLs with a comma
             Price: tour.price,
             'TripAdvisor Link': tour.tripAdvisor_link
         }));
@@ -30,7 +29,7 @@ const CSVExport: React.FC<CSVExportProps> = ({ tours, selectedTours, className }
         // Use PapaParse to convert the data to CSV
         const csv = Papa.unparse(csvData);
 
-        // Create a Blob from the CSV data and trigger the download
+        // blob holds the CSV data that will be downloaded.
         const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
