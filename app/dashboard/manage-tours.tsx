@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Archive, Edit, Plus, Trash2 } from 'lucide-react';
-import { supabase } from '@/lib/supbase';
 import TourSearch from './tourSearch';
 import CSVExport from './CSVExport';
-import { fetchTours } from '../Services/tourService';
+import * as tourService from '../Services/tourService';
 
 // URL validation helper function
 const isValidUrl = (url: string) => {
@@ -36,16 +35,17 @@ export default function ManageTours() {
     const filteredTours = tours.filter((tour) => !tour.archived);
 
     useEffect(() => {
-        const getTours = async () => {
-            const { data, error } = await fetchTours();
-            if (error) {
-                console.error('Error fetching tours:', error);
-            } else {
-                setTours(data);
-            }
-        };
-        getTours();
+        fetchTours();
     }, []);
+
+    const fetchTours = async () => {
+        const { data, error } = await tourService.fetchTours();
+        if (error) {
+            console.error('Error fetching tours:', error);
+        } else {
+            setTours(data);
+        }
+    };
     const openAddModal = () => {
         setShowModal(true);
         setIsEditing(false);
@@ -86,7 +86,6 @@ export default function ManageTours() {
     const handleCreateTour = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Reset previous error messages
         setPhotoUrlError('');
         setTripAdvisorLinkError('');
 
@@ -97,7 +96,6 @@ export default function ManageTours() {
             valid = false;
         }
 
-        // Validate each URL in the photoUrls array
         photoUrls.forEach((url) => {
             if (!isValidUrl(url)) {
                 setPhotoUrlError('Please enter valid URLs.');
@@ -117,30 +115,24 @@ export default function ManageTours() {
             description, 
             latitude: parseFloat(latitude as string) || 0, 
             longitude: parseFloat(longitude as string) || 0, 
-            photo_urls: photoUrls,  // Store the photo URLs as an array
+            photo_urls: photoUrls,  
             price: parseFloat(price as string) || 0, 
             tripAdvisor_link: tripAdvisor_link 
         };
 
-        try {
-            const { data, error } = await supabase.from('tours').insert([newTour]);
-            if (error) {
-                console.error('Error creating tour:', error.message);
-                alert(`Error: ${error.message}`);
-                return;
-            }
-            fetchTours();
-            closeModal();
-        } catch (error) {
-            console.error('Unexpected error creating tour:', error);
-            alert(`Unexpected error: ${error instanceof Error ? error.message : error}`);
+        const { error } = await tourService.createTour(newTour);
+        if (error) {
+            console.error('Error creating tour:', error.message);
+            alert(`Error: ${error.message}`);
+            return;
         }
+        fetchTours();
+        closeModal();
     };
 
     const handleUpdateTour = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Reset previous error messages
         setPhotoUrlError('');
         setTripAdvisorLinkError('');
 
@@ -151,7 +143,6 @@ export default function ManageTours() {
             valid = false;
         }
 
-        // Validate each URL in the photoUrls array
         photoUrls.forEach((url) => {
             if (!isValidUrl(url)) {
                 setPhotoUrlError('Please enter valid URLs.');
@@ -171,45 +162,40 @@ export default function ManageTours() {
             description, 
             latitude: parseFloat(latitude as string) || 0, 
             longitude: parseFloat(longitude as string) || 0, 
-            photo_urls: photoUrls,  // Update the photo_urls array
+            photo_urls: photoUrls, 
             price: parseFloat(price as string) || 0, 
             tripAdvisor_link: tripAdvisor_link 
         };
-        try {
-            const { error } = await supabase.from('tours').update(updatedTour ).eq('id', editingTour.id);
-            if (error) throw error;
-            fetchTours();
-            closeModal();
-        } catch (error) {
+
+        const { error } = await tourService.updateTour(updatedTour, editingTour.id);
+
+        if (error) {
             console.error('Error updating tour:', error);
+            return;
         }
+        fetchTours();
+        closeModal();
     };
+
 
     const handleDeleteTour = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this tour?')) {
-            try {
-                const { error } = await supabase.from('tours').delete().eq('id', id);
-                if (error) throw error;
-                fetchTours();
-            } catch (error) {
+            const { error } = await tourService.deleteTour(id);
+            if (error) {
                 console.error('Error deleting tour:', error);
+                return;
             }
+            fetchTours();
         }
     };
 
     const handleArchiveTour = async (tourId: string) => {
-        try {
-            // Archive the tour in the database
-            await supabase
-                .from('tours')
-                .update({ archived: true }) // Assuming `archived` is a column
-                .eq('id', tourId);
-    
-            // Remove the archived tour from the state (optimistic UI update)
-            setTours((prevTours) => prevTours.filter((tour) => tour.id !== tourId));
-        } catch (error) {
-            console.error("Error archiving tour:", error);
+        const { error } = await tourService.archiveTour(tourId);
+        if (error) {
+            console.error('Error archiving tour:', error);
+            return;
         }
+        fetchTours();
     };
       
       
