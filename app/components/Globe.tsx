@@ -35,7 +35,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
   useEffect(() => {
     const getTours = async () => {
       const { data } = await fetchTours();
-      setTours(data);
+      setTours(data ?? []);
     };
 
     getTours();
