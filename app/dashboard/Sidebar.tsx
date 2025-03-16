@@ -1,38 +1,55 @@
 'use client';
 
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  MapPin, 
-  User, 
-  UserCircle, 
-  Settings as SettingsIcon, 
-  LogOutIcon, 
-  Archive
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, User, Archive } from 'lucide-react';
 
 interface SidebarProps {
-  isCollapsed: boolean;
-  toggleSidebar: () => void;
-  setActiveSection: (section: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours'| null) => void;
-  handleLogout: () => void;
-  activeSection: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours'| null;
+    isCollapsed: boolean;
+    toggleSidebar: () => void;
+    setActiveSection: (section: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting') => void;
+    activeSection: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | null;
 }
+  
+  
 
-const Sidebar = ({
-  isCollapsed, 
-  toggleSidebar, 
-  setActiveSection, 
-  handleLogout, 
-  activeSection 
-}: SidebarProps) => {
-  const handleClick = (section: 'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours') => {
+const Sidebar = ({ isCollapsed, toggleSidebar, setActiveSection, activeSection }: SidebarProps) => {
+  const handleClick = (section: 'tours' | 'guides' | 'archivedTours'  ) => {
     setActiveSection(section);
   };
 
+  // Reusable NavItem component
+  const NavItem = ({
+    section,
+    icon: Icon,
+    label,
+  }: {
+    section: 'tours' | 'guides' | 'archivedTours'  ;
+    icon: React.ComponentType<{ size: number }>;
+    label: string;
+  }) => (
+    <li className="mb-4">
+      <button
+        onClick={() => handleClick(section)}
+        className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
+          activeSection === section
+            ? 'text-gray-400 font-bold' // Active section: light gray and bold
+            : 'text-gray-600 hover:text-gray-500' // Inactive section: normal gray, darker on hover
+        }`}
+      >
+        {/* Wrap the icon with a span or div to apply the className */}
+        <span className="mr-2">
+          <Icon size={24} />
+        </span>
+        {!isCollapsed && <span>{label}</span>}
+      </button>
+    </li>
+  );
+
   return (
-    <div className={`bg-white text-gray-800 shadow-xl p-4 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col fixed top-0 left-0 bottom-0`}>
-      
+    <div
+      className={`bg-gray-900 text-gray-800 shadow-xl p-4 transition-all duration-300 ${
+        isCollapsed ? 'w-20' : 'w-64'
+      } flex flex-col fixed top-0 left-0 bottom-0`}
+    >
       {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
@@ -42,110 +59,18 @@ const Sidebar = ({
       </button>
 
       {/* Title */}
-      <h1 className={`${isCollapsed ? 'hidden' : 'block'} text-xl mb-4 text-gray-500`}>
+      <h1 className={`${isCollapsed ? 'hidden' : 'block'} text-xl mb-4 text-gray-400`}>
         Management
       </h1>
 
       {/* Navigation */}
       <nav className="flex-grow">
         <ul>
-          {/* Tours */}
-          <li className="mb-4">
-            <button
-              onClick={() => handleClick('tours')}
-              className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
-                activeSection === 'tours' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'
-              }`}
-            >
-              <MapPin
-                size={24}
-                className={`mr-2 ${activeSection === 'tours' ? 'text-gray-800' : 'text-gray-400'}`}
-              />
-              {!isCollapsed && <span>Tours</span>}
-            </button>
-          </li>
-
-          {/* Guides */}
-          <li className="mb-4">
-            <button
-              onClick={() => handleClick('guides')}
-              className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
-                activeSection === 'guides' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'
-              }`}
-            >
-              <User
-                size={24}
-                className={`mr-2 ${activeSection === 'guides' ? 'text-gray-800' : 'text-gray-400'}`}
-              />
-              {!isCollapsed && <span>Guides</span>}
-            </button>
-          </li>
-
-          {/* Archived Tours */}
-          <li className="mb-4">
-            <button
-              onClick={() => handleClick('archivedTours')}
-              className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${activeSection === 'archivedTours' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'}`}
-            >
-              <Archive size={24} className={`mr-2 ${activeSection === 'archivedTours' ? 'text-gray-800' : 'text-gray-400'}`} />
-              {!isCollapsed && <span>Archived Tours</span>}
-            </button>
-          </li>
+          <NavItem section="tours" icon={MapPin} label="Tours" />
+          <NavItem section="guides" icon={User} label="Guides" />
+          <NavItem section="archivedTours" icon={Archive} label="Archived Tours" />
         </ul>
       </nav>
-
-      {/* Account Section */}
-      <h1 className={`${isCollapsed ? 'hidden' : 'block'} text-xl mb-4 text-gray-500`}>
-        Account
-      </h1>
-      <ul>
-        {/* Profile */}
-        <li className="mb-4">
-          <button
-            onClick={() => handleClick('profile')}
-            className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
-              activeSection === 'profile' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'
-            }`}
-          >
-            <UserCircle
-              size={24}
-              className={`mr-2 ${activeSection === 'profile' ? 'text-gray-800' : 'text-gray-400'}`}
-            />
-            {!isCollapsed && <span>Profile</span>}
-          </button>
-        </li>
-        
-        {/* Settings */}
-        <li className="mb-4">
-          <button
-            onClick={() => handleClick('setting')}
-            className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
-              activeSection === 'setting' ? 'text-gray-800 font-bold' : 'hover:text-gray-600'
-            }`}
-          >
-            <SettingsIcon
-              size={24}
-              className={`mr-2 ${activeSection === 'setting' ? 'text-gray-800' : 'text-gray-400'}`}
-            />
-            {!isCollapsed && <span>Settings</span>}
-          </button>
-        </li>
-      </ul>
-
-      {/* Logout Button */}
-      <button
-        onClick={handleLogout}
-        className="mt-6 w-full flex items-center justify-center p-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
-      >
-        {isCollapsed ? (
-          <LogOutIcon size={28} />
-        ) : (
-          <>
-            <LogOutIcon size={24} className="mr-2" />
-            Logout
-          </>
-        )}
-      </button>
     </div>
   );
 };

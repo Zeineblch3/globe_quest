@@ -8,10 +8,11 @@ import ManageTours from './manage-tours';
 import ArchivedTours from './archivedTours'; // Import ArchivedTours component
 import { getSession, signOut, subscribeToAuthStateChanges } from '../Services/authService';
 import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
-  const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'profile' | 'setting' | 'archivedTours' | null>(null);
+  const [activeSection, setActiveSection] = useState<'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | null>(null);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const router = useRouter();
 
@@ -56,9 +57,9 @@ export default function Dashboard() {
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
         setActiveSection={setActiveSection}
-        handleLogout={handleLogout}
         activeSection={activeSection}
-      />
+        />
+
 
       {/* Main Content */}
       <div
@@ -66,6 +67,14 @@ export default function Dashboard() {
           isCollapsed ? 'ml-20' : 'ml-[256px]'
         }`}
       >
+        {/* Navbar */}
+        <Navbar
+            userEmail={user?.email}
+            handleLogout={handleLogout}
+            setActiveSection={setActiveSection}
+            activeSection={activeSection}
+            />
+        
         {activeSection === null ? (
           <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-4xl font-semibold text-gray-800 mb-4 text-center">
