@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Archive, Edit, Plus, Trash2 } from 'lucide-react';
 import TourSearch from './tourSearch';
-import CSVExport from './CSVExport';
+import CSVExport from './Export';
 import * as tourService from '../Services/tourService';
 
 // URL validation helper function
@@ -221,15 +221,17 @@ export default function ManageTours() {
         <div>
             {/* Search Bar Component */}
             <TourSearch setTours={setTours} />
+
             <button onClick={openAddModal} className="mt-4 p-2 bg-black text-white rounded flex items-center">
                 <Plus size={20} className="mr-2" /> Add New Tour
             </button>
             
             <CSVExport
-                tours={tours.filter((tour) => selectedTours.has(tour.id))} 
-                selectedTours={selectedTours} 
-                className="p-2 bg-black text-white rounded flex items-center ml-auto"
+                tours={tours.filter((tour) => selectedTours.has(tour.id))}
+                selectedTours={selectedTours}
+                className="absolute top-0 right-0 p-2 bg-black text-white rounded flex items-center"
             />
+
 
             <div className="overflow-x-auto">
                 <table className="mt-6 w-full table-auto border-collapse">

@@ -31,7 +31,7 @@ const Navbar = ({ userEmail, handleLogout, setActiveSection, activeSection }: Na
         {/* User Info Button */}
         <button
           aria-label="User Profile"
-          className={`flex items-center space-x-2 ${activeSection === 'profile' ? 'text-blue-500' : 'text-gray-700'}`}
+          className={`flex items-center space-x-2 ${activeSection === 'profile' ? 'text-gray-500' : 'text-gray-700'}`}
           onClick={() => setActiveSection('profile')}
         >
           <UserCircle size={28} />
@@ -41,7 +41,7 @@ const Navbar = ({ userEmail, handleLogout, setActiveSection, activeSection }: Na
         {/* Settings Button */}
         <button
           aria-label="Settings"
-          className={`flex items-center space-x-2 ${activeSection === 'setting' ? 'text-blue-500' : 'text-gray-700'}`}
+          className={`flex items-center space-x-2 ${activeSection === 'setting' ? 'text-gray-500' : 'text-gray-700'}`}
           onClick={() => setActiveSection('setting')}
         >
           <SettingsIcon size={28} />
