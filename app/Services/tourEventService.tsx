@@ -235,5 +235,3 @@ export const deleteTourist = async (touristId: string) => {
 
   return { success: true };
 };
-
-

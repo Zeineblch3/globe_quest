@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -21,66 +16,91 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-
-@keyframes backgroundMove {
-  0% { background-position: 30% 90%; }
-  10% { background-position: 50% 30%; }
-  20% { background-position: 70% 60%; }
-  30% { background-position: 20% 40%; }
-  40% { background-position: 60% 10%; }
-  50% { background-position: 80% 50%; }
-  60% { background-position: 30% 80%; }
-  70% { background-position: 90% 20%; }
-  80% { background-position: 40% 70%; }
-  90% { background-position: 10% 10%; }
-  100% { background-position: 50% 90%; }
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 .animated-bg {
-  background: linear-gradient(to top, #182230, #0c1b30, #000000);
-  background-size: 400% 400%;
-  animation: backgroundMove 30s ease-in-out infinite alternate;
-  position: relative; /* To position stars absolutely inside the container */
-  overflow: hidden; /* Hide any stars that overflow */
-}
-
-.stars {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Prevent stars from interfering with other elements */
+  background: linear-gradient(135deg, #050a18 0%, #0c1b30 20%, #151333 40%, #0d0c2f 60%, #0c0d30 80%, #050a18 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 30s ease infinite;
+  z-index: 0;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.stars {
+  position: absolute;
+  top: 0; /* Ensure stars start from the top */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .star {
   position: absolute;
   background-color: white;
   border-radius: 50%;
-  opacity: 0.8;
-  animation: moveStars 100s infinite linear;
+  opacity: 1;
+  width: 3px;
+  height: 3px;
+  animation: twinkle 5s infinite ease-in-out alternate, moveStars 100s infinite linear;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
 }
 
 @keyframes moveStars {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(100vw, 100vh);
-  }
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100vh); } /* Stars move from top to bottom */
 }
 
-/* Star size and movement speeds */
-.stars .star:nth-child(odd) {
-  width: 2px;
-  height: 2px;
-  animation-duration: 60s;
+/* Nebula styles remain the same */
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.4;
+  animation: nebulaFloat 80s infinite ease-in-out alternate;
 }
 
-.stars .star:nth-child(even) {
-  width: 3px;
-  height: 3px;
-  animation-duration: 80s;
+@keyframes nebulaFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(5vw, 5vh) scale(1.1); }
+  50% { transform: translate(-5vw, 10vh) scale(0.9); }
+  75% { transform: translate(-10vw, -5vh) scale(1.2); }
+  100% { transform: translate(10vw, -10vh) scale(1); }
+}
+
+
+.smoke-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.005' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  animation: smokeMove 20s infinite alternate;
+  z-index: 2;
+}
+
+@keyframes smokeMove {
+  0% { opacity: 0.15; }
+  100% { opacity: 0.35; }
 }
