@@ -126,14 +126,15 @@ export default function TourEvent() {
   };
   
   
-  
 
   const handleTouristChange = (index: number, field: keyof Tourist, value: string) => {
     const updatedTourists = tourists.map((tourist, i) =>
       i === index ? { ...tourist, [field]: value } : tourist
     );
-    setTourists(updatedTourists);
+    setTourists(updatedTourists); // Update state to reflect changes
   };
+  
+  
   
 
   const handleSaveEvent = async (e: React.FormEvent) => { 
@@ -145,10 +146,10 @@ export default function TourEvent() {
 
       if (selectedEvent) {
         // Modify existing event and tourist data (ensure no 'id' is sent here)
-        await updateTourEventTourist(selectedEvent.id, tourists.map(({ id, ...rest }) => rest));
+        await updateTourEventTourist(selectedEvent.id, tourists);
         successMessage = 'Event updated successfully!';
       } else {
-        // 🔥 Create new event here
+        // Create new event here
         const result = await createTourEvent(eventName, dateFrom, dateTo, selectedTour, tourists);
         
         if (!result.success) {
@@ -160,7 +161,7 @@ export default function TourEvent() {
 
       console.log(successMessage);
 
-      // ✅ Ensure we fetch the updated list after creation
+      // Ensure we fetch the updated list after creation
       const updatedEvents = await fetchTourEvents();
       setTourEvents(updatedEvents.filter((event: any) => !event.archived));
       setShowModal(false);
@@ -172,7 +173,6 @@ export default function TourEvent() {
   };
 
   
-
   const handleArchive = async (eventId: string) => {
     try {
       await archiveTourEvent(eventId);

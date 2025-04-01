@@ -93,10 +93,10 @@ export const unarchiveTourEvent = async (eventId: string) => {
 // Update Tour Event Tourists ONLY
 export const updateTourEventTourist = async (eventId: string, tourists: Tourist[]) => {
   try {
-    // Save tourists and associate them with the event (using the eventId)
-    const { success: touristSuccess, message: touristMessage } = await saveTourists(tourists, eventId);
-    if (!touristSuccess) {
-      return { success: false, message: touristMessage };
+    // Assuming 'tourists' contains 'id', we want to update existing tourists and upsert new ones
+    const { success, message } = await saveTourists(tourists, eventId);
+    if (!success) {
+      return { success: false, message };
     }
 
     return { success: true, message: "Tourist information updated successfully." };
@@ -105,6 +105,7 @@ export const updateTourEventTourist = async (eventId: string, tourists: Tourist[
     return { success: false, message: "Unexpected error." };
   }
 };
+
 
 // Create the Tour Event
 export const createTourEvent = async (eventName: string, dateFrom: string, dateTo: string, selectedTour: string | null, tourists: Tourist[]) => {
@@ -136,27 +137,74 @@ export const createTourEvent = async (eventName: string, dateFrom: string, dateT
 
 // Save Tourists
 export const saveTourists = async (tourists: Tourist[], eventId: string) => {
-  const { data: touristsData, error: touristsError } = await supabase
+  // Fetch existing tourists for this event
+  const { data: existingTourists, error: existingTouristsError } = await supabase
     .from("tourists")
-    .upsert(
-      tourists.map((tourist) => ({
-        ...(tourist.id ? { id: tourist.id } : {}), // Include ID only if it exists
-        name: tourist.name,
-        email: tourist.email,
-        country: tourist.country,
-        notes: tourist.notes,
-        tour_event_id: eventId,
-      }))
-    )
-    .select("id");
+    .select("id")
+    .eq("tour_event_id", eventId);
 
-  if (touristsError) {
-    console.error("Error saving tourists:", touristsError.message);
-    return { success: false, message: "Error saving tourists." };
+  if (existingTouristsError) {
+    console.error("Error fetching existing tourists:", existingTouristsError.message);
+    return { success: false, message: "Error fetching existing tourists." };
   }
 
-  return { success: true, touristsData };
+  // Filter out tourists that are already associated with this event
+  const existingTouristIds = existingTourists.map((tourist: any) => tourist.id);
+
+  // Check which tourists need to be updated (those with matching `id`)
+  const touristsToUpdate = tourists.filter((tourist) => existingTouristIds.includes(tourist.id));
+  
+  // Check which tourists are new (those without `id` or not present in existing tourists)
+  const touristsToAdd = tourists.filter((tourist) => !existingTouristIds.includes(tourist.id));
+
+  // First, upsert new tourists
+  if (touristsToAdd.length > 0) {
+    const { data: touristsData, error: touristsError } = await supabase
+      .from("tourists")
+      .upsert(
+        touristsToAdd.map((tourist) => ({
+          ...(tourist.id ? { id: tourist.id } : {}), // Include ID only if it exists
+          name: tourist.name,
+          email: tourist.email,
+          country: tourist.country,
+          notes: tourist.notes,
+          tour_event_id: eventId,
+        }))
+      )
+      .select("id");
+
+    if (touristsError) {
+      console.error("Error saving tourists:", touristsError.message);
+      return { success: false, message: "Error saving new tourists." };
+    }
+  }
+
+  // Then, update existing tourists' fields
+  if (touristsToUpdate.length > 0) {
+    const { data: updatedTourists, error: updateError } = await supabase
+      .from("tourists")
+      .upsert(
+        touristsToUpdate.map((tourist) => ({
+          id: tourist.id, // Ensure `id` is included for updates
+          name: tourist.name,
+          email: tourist.email,
+          country: tourist.country,
+          notes: tourist.notes,
+          tour_event_id: eventId,
+        }))
+      )
+      .select("id");
+
+    if (updateError) {
+      console.error("Error updating tourists:", updateError.message);
+      return { success: false, message: "Error updating existing tourists." };
+    }
+  }
+
+  return { success: true };
 };
+
+
 
 // Link Tourists to the Event (this step is now redundant with the direct `tour_event_id` in the tourists table, but keeping it for reference)
 export const linkTouristsToEvent = async (eventId: string, touristsData: any[]) => {
