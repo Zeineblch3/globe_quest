@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Archive, Edit, Plus, Trash2 } from 'lucide-react';
 import TourSearch from './tourSearch';
-import CSVExport from './Export';
 import * as tourService from '../Services/tourService';
+import Export from './Export';
 
 // URL validation helper function
 const isValidUrl = (url: string) => {
@@ -217,6 +217,17 @@ export default function ManageTours() {
         });
     };
 
+    const tourColumns = [
+        { key: 'id', label: 'Tour ID' },
+        { key: 'name', label: 'Tour Name' },
+        { key: 'description', label: 'Description' },
+        { key: 'latitude', label: 'Latitude' },
+        { key: 'longitude', label: 'Longitude' },
+        { key: 'price', label: 'price' },
+        { key: 'tripAdvisor_link', label: 'TripAdvisor_link' },
+        
+      ];
+
     return (
         <div>
             {/* Search Bar Component */}
@@ -225,12 +236,14 @@ export default function ManageTours() {
             <button onClick={openAddModal} className="mt-4 p-2 bg-black text-white rounded flex items-center">
                 <Plus size={20} className="mr-2" /> Add New Tour
             </button>
-            
-            <CSVExport
-                tours={tours.filter((tour) => selectedTours.has(tour.id))}
-                selectedTours={selectedTours}
-                className="absolute top-0 right-0 p-2 bg-black text-white rounded flex items-center"
-            />
+            <div className="flex justify-end">
+                <Export
+                    data={tours.filter((tour) => selectedTours.has(tour.id))} // Filter selected tours
+                    columns={tourColumns} // Pass the columns to be exported
+                    fileName="Selected_Tours" // Customize the file name
+                    className="p-2 bg-black text-white rounded flex items-center"
+                />
+            </div>
 
 
             <div className="overflow-x-auto">
@@ -320,58 +333,58 @@ export default function ManageTours() {
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
                     <div className="bg-white p-6 rounded-xl shadow-lg w-1/3 max-h-[80vh] overflow-auto text-gray-800">
                         <h3 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Tour' : 'Add Tour'}</h3>
-                        <form onSubmit={isEditing ? handleUpdateTour : handleCreateTour} className="space-y-4">
+                        <form onSubmit={isEditing ? handleUpdateTour : handleCreateTour} className="space-y-4 bg-white p-6 rounded-lg w-full max-w-lg">
                             <div>
-                                <label htmlFor="name" className="block">Name</label>
+                                <label htmlFor="name" className="block text-sm font-medium text-gray-900">Name</label>
                                 <input
                                     type="text"
                                     id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="description" className="block">Description</label>
+                                <label htmlFor="description" className="block text-sm font-medium text-gray-900">Description</label>
                                 <textarea
                                     id="description"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     required
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="latitude" className="block">Latitude</label>
+                                    <label htmlFor="latitude" className="block text-sm font-medium text-gray-900">Latitude</label>
                                     <input
                                         type="number"
                                         id="latitude"
                                         value={latitude}
                                         onChange={(e) => setLatitude(e.target.value)}
                                         required
-                                        className="mt-1 p-2 border rounded w-full text-gray-900"
+                                        className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label htmlFor="longitude" className="block">Longitude</label>
+                                    <label htmlFor="longitude" className="block text-sm font-medium text-gray-900">Longitude</label>
                                     <input
                                         type="number"
                                         id="longitude"
                                         value={longitude}
                                         onChange={(e) => setLongitude(e.target.value)}
                                         required
-                                        className="mt-1 p-2 border rounded w-full text-gray-900"
+                                        className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="photoUrls" className="block">Photo URLs</label>
+                                <label htmlFor="photoUrls" className="block text-sm font-medium text-gray-900">Photo URLs</label>
                                 <div className="space-y-2">
                                     {photoUrls.map((url, index) => (
                                         <div key={index} className="flex items-center space-x-2">
@@ -383,14 +396,14 @@ export default function ManageTours() {
                                                     updatedUrls[index] = e.target.value;
                                                     setPhotoUrls(updatedUrls);
                                                 }}
-                                                className="mt-1 p-2 border rounded w-full text-gray-900"
+                                                className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
                                     ))}
                                     <button
                                         type="button"
                                         onClick={addPhotoUrl}
-                                        className="text-blue-500 hover:text-blue-700"
+                                        className="text-blue-500 hover:text-blue-700 text-base"
                                     >
                                         + Add Another Photo URL
                                     </button>
@@ -399,25 +412,25 @@ export default function ManageTours() {
                             </div>
 
                             <div>
-                                <label htmlFor="price" className="block">Price</label>
+                                <label htmlFor="price" className="block text-sm font-medium text-gray-900">Price</label>
                                 <input
                                     type="number"
                                     id="price"
                                     value={price}
                                     onChange={(e) => setPrice(e.target.value)}
                                     required
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
                             <div>
-                                <label htmlFor="tripAdvisor_link" className="block">TripAdvisor Link</label>
+                                <label htmlFor="tripAdvisor_link" className="block text-sm font-medium text-gray-900">TripAdvisor Link</label>
                                 <input
                                     type="text"
                                     id="tripAdvisor_link"
                                     value={tripAdvisor_link}
                                     onChange={(e) => setTripAdvisor_link(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {tripAdvisorLinkError && <p className="text-red-600 text-sm">{tripAdvisorLinkError}</p>}
                             </div>

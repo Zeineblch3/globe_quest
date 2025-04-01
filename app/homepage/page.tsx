@@ -27,7 +27,7 @@ const GlobePage: React.FC = () => {
         {/* Logo */}
         <div className="text-2xl font-bold flex items-center space-x-2">
           <span className="bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">RISPER</span>
-          <span>EXPLORE</span>
+          <span>GlobeQuest</span>
         </div>
         {/* Navigation Links */}
         <nav className="hidden md:flex space-x-8">

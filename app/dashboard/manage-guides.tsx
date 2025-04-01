@@ -260,71 +260,71 @@ export default function ManageGuides() {
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center">
                     <div className="bg-white p-6 rounded-xl shadow-lg w-1/3 max-h-[80vh] overflow-auto text-gray-800">
                         <h3 className="text-xl font-semibold">{isEditing ? 'Edit Guide' : 'Add Guide'}</h3>
-                        <form onSubmit={isEditing ? handleUpdateGuide : handleCreateGuide} className="space-y-4 mt-4">
+                        <form onSubmit={isEditing ? handleUpdateGuide : handleCreateGuide} className="space-y-4 bg-white p-6 rounded-lg w-full max-w-lg">
                             <div>
-                                <label htmlFor="name" className="block font-medium">Guide Name</label>
+                                <label htmlFor="name" className="block text-sm font-medium text-gray-900">Guide Name</label>
                                 <input
                                     type="text"
                                     id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {nameError && <p className="text-red-500 text-sm">{nameError}</p>}
                             </div>
                             <div>
-                                <label htmlFor="speciality" className="block font-medium">Speciality</label>
+                                <label htmlFor="speciality" className="block text-sm font-medium text-gray-900">Speciality</label>
                                 <input
                                     type="text"
                                     id="speciality"
                                     value={speciality}
                                     onChange={(e) => setSpeciality(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {specialityError && <p className="text-red-500 text-sm">{specialityError}</p>}
                             </div>
                             <div>
-                                <label htmlFor="availability" className="block font-medium">Availability</label>
+                                <label htmlFor="availability" className="block text-sm font-medium text-gray-900">Availability</label>
                                 <select
                                     id="availability"
                                     value={availability ? 'true' : 'false'}
                                     onChange={(e) => setAvailability(e.target.value === 'true')}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="true">Available</option>
                                     <option value="false">Not Available</option>
                                 </select>
                             </div>
                             <div>
-                                <label htmlFor="photoUrl" className="block font-medium">Photo URL</label>
+                                <label htmlFor="photoUrl" className="block text-sm font-medium text-gray-900">Photo URL</label>
                                 <input
                                     type="text"
                                     id="photoUrl"
                                     value={photoUrl}
                                     onChange={(e) => setPhotoUrl(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {photoUrlError && <p className="text-red-500 text-sm">{photoUrlError}</p>}
                             </div>
                             <div>
-                                <label htmlFor="phoneNumber" className="block font-medium">Phone Number</label>
+                                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-900">Phone Number</label>
                                 <input
                                     type="text"
                                     id="phoneNumber"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {phoneNumberError && <p className="text-red-500 text-sm">{phoneNumberError}</p>}
                             </div>
                             <div>
-                                <label htmlFor="email" className="block font-medium">Email</label>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-900">Email</label>
                                 <input
                                     type="email"
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="mt-1 p-2 border rounded w-full text-gray-900"
+                                    className="w-full p-3 mt-2 bg-white text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
                             </div>

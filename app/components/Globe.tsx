@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Html, useGLTF } from '@react-three/drei';
+import { Html, Sphere, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
 import TourPopup from './TourPopup'; // Import the TourPopup component
@@ -97,8 +97,10 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
                 setCurrentImageIndex(0); // Reset to the first image
               }}
             >
-              <coneGeometry args={[0.2, 0.8, 32]} /> {/* Increased initial size */}
-              <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
+             <Sphere args={[0.1, 32, 32]}>
+                <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
+              </Sphere>
+
             </mesh>
           );
         })}

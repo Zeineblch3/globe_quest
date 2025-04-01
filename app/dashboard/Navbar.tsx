@@ -1,57 +1,58 @@
 'use client';
 
-import { Bell, UserCircle, LogOut, SettingsIcon } from 'lucide-react';
+import { Bell, UserCircle, LogOut, SettingsIcon, Home } from 'lucide-react';
 
 interface NavbarProps {
   userEmail: string | null;
   handleLogout: () => void;
-  setActiveSection: (section: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting') => void;
-  activeSection: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | null;
+  setActiveSection: (section: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting'| 'tourEvents' | 'archivedTourEvent' | 'clients' | null) => void;
+  activeSection: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | 'tourEvents'| 'archivedTourEvent' | 'clients' | null;
 }
 
-const Navbar = ({ userEmail, handleLogout, setActiveSection, activeSection }: NavbarProps) => {
+const Navbar = ({ handleLogout, setActiveSection, activeSection }: NavbarProps) => {
   return (
-    <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      {/* Page Title */}
-      <h1 className="text-2xl font-semibold text-gray-800">Admin Dashboard</h1>
+    <nav className="bg-gray-900 shadow-md px-6 py-4 flex justify-between items-center border-b border-gray-800">
+      {/* Home Button */}
+      <button
+          aria-label="Home"
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition ${activeSection === null ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-700'}`}
+          onClick={() => setActiveSection(null)}
+        >
+          <Home size={24} />
+        </button>
+      <h1 className="text-xl font-semibold text-gray-200 ml-2 mr-auto">Admin Dashboard</h1>
 
-      {/* Right Section */}
       <div className="flex items-center space-x-4">
-        {/* Notifications */}
         <button
           aria-label="Notifications"
-          className="relative p-2 rounded-full hover:bg-gray-100"
+          className="relative p-2 rounded-lg hover:bg-gray-700 transition"
         >
-          <Bell size={24} className="text-gray-600" />
+          <Bell size={24} className="text-white" />
           <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1">
             3
           </span>
         </button>
 
-        {/* User Info Button */}
-        <button
-          aria-label="User Profile"
-          className={`flex items-center space-x-2 ${activeSection === 'profile' ? 'text-gray-500' : 'text-gray-700'}`}
-          onClick={() => setActiveSection('profile')}
-        >
-          <UserCircle size={28} />
-          <span className="text-gray-800 font-medium">{userEmail}</span>
-        </button>
-
-        {/* Settings Button */}
         <button
           aria-label="Settings"
-          className={`flex items-center space-x-2 ${activeSection === 'setting' ? 'text-gray-500' : 'text-gray-700'}`}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition ${activeSection === 'setting' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-700'}`}
           onClick={() => setActiveSection('setting')}
         >
-          <SettingsIcon size={28} />
+          <SettingsIcon size={24} />
         </button>
 
-        {/* Logout Button */}
+        <button
+          aria-label="User Profile"
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition ${activeSection === 'profile' ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-700'}`}
+          onClick={() => setActiveSection('profile')}
+        >
+          <UserCircle size={24} />
+        </button>
+
         <button
           aria-label="Logout"
           onClick={handleLogout}
-          className="flex items-center space-x-1 text-red-500 hover:text-red-600"
+          className="flex items-center space-x-2 text-red-500 hover:text-red-600 px-3 py-2 rounded-lg transition"
         >
           <LogOut size={20} />
           <span>Logout</span>

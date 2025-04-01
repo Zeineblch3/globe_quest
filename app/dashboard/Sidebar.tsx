@@ -1,43 +1,36 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, MapPin, User, Archive } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, User, Archive, Calendar } from 'lucide-react';
 
 interface SidebarProps {
-    isCollapsed: boolean;
-    toggleSidebar: () => void;
-    setActiveSection: (section: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting') => void;
-    activeSection: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | null;
+  isCollapsed: boolean;
+  toggleSidebar: () => void;
+  setActiveSection: (section: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | 'tourEvents' | 'archivedTourEvent' | 'clients') => void;
+  activeSection: 'tours' | 'guides' | 'archivedTours' | 'profile' | 'setting' | 'tourEvents' | 'archivedTourEvent' | 'clients' | null;
 }
-  
-  
 
 const Sidebar = ({ isCollapsed, toggleSidebar, setActiveSection, activeSection }: SidebarProps) => {
-  const handleClick = (section: 'tours' | 'guides' | 'archivedTours'  ) => {
+  const handleClick = (section: 'tours' | 'guides' | 'archivedTours' | 'tourEvents' | 'archivedTourEvent' | 'clients') => {
     setActiveSection(section);
   };
 
-  // Reusable NavItem component
   const NavItem = ({
     section,
     icon: Icon,
     label,
   }: {
-    section: 'tours' | 'guides' | 'archivedTours'  ;
+    section: 'tours' | 'guides' | 'archivedTours' | 'tourEvents' | 'archivedTourEvent' | 'clients';
     icon: React.ComponentType<{ size: number }>;
     label: string;
   }) => (
-    <li className="mb-4">
+    <li className="mb-2">
       <button
         onClick={() => handleClick(section)}
-        className={`flex items-center text-lg p-2 rounded-full focus:outline-none transition-all ${
-          activeSection === section
-            ? 'text-gray-400 font-bold' // Active section: light gray and bold
-            : 'text-gray-600 hover:text-gray-500' // Inactive section: normal gray, darker on hover
-        }`}
+        className={`flex items-center text-base px-4 py-2 rounded-lg focus:outline-none transition-all font-medium w-full 
+          ${activeSection === section ? 'bg-gray-800 text-white shadow-md' : 'text-gray-400 hover:bg-gray-700 hover:text-white'}`}
       >
-        {/* Wrap the icon with a span or div to apply the className */}
-        <span className="mr-2">
-          <Icon size={24} />
+        <span className="mr-3">
+          <Icon size={20} />
         </span>
         {!isCollapsed && <span>{label}</span>}
       </button>
@@ -46,29 +39,32 @@ const Sidebar = ({ isCollapsed, toggleSidebar, setActiveSection, activeSection }
 
   return (
     <div
-      className={`bg-gray-900 text-gray-800 shadow-xl p-4 transition-all duration-300 ${
-        isCollapsed ? 'w-20' : 'w-64'
-      } flex flex-col fixed top-0 left-0 bottom-0`}
+      className={`bg-gray-900 text-gray-100 shadow-lg p-4 transition-all duration-300 h-screen 
+        ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col fixed top-0 left-0 bottom-0 border-r border-gray-800`}
     >
-      {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="mb-4 flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 transition ml-auto"
+        className="mb-4 flex items-center justify-center w-10 h-10 rounded-lg transition ml-auto"
       >
-        {isCollapsed ? <ChevronRight size={28} /> : <ChevronLeft size={28} />}
+        {isCollapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
       </button>
 
-      {/* Title */}
-      <h1 className={`${isCollapsed ? 'hidden' : 'block'} text-xl mb-4 text-gray-400`}>
-        Management
-      </h1>
+      {!isCollapsed && (
+        <>
+          <h1 className="text-2xl font-semibold text-gray-300 mb-4">
+            <span className="text-blue-500">Risper</span> Management
+          </h1>
+        </>
+      )}
 
-      {/* Navigation */}
       <nav className="flex-grow">
         <ul>
           <NavItem section="tours" icon={MapPin} label="Tours" />
           <NavItem section="guides" icon={User} label="Guides" />
           <NavItem section="archivedTours" icon={Archive} label="Archived Tours" />
+          <NavItem section="tourEvents" icon={Calendar} label="Tour Events" />
+          <NavItem section="archivedTourEvent" icon={Archive} label="Archived Tour Events" />
+          <NavItem section="clients" icon={User} label="Clients" />
         </ul>
       </nav>
     </div>

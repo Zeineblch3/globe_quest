@@ -54,9 +54,12 @@ export default function Login() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-900">
             <div className="w-96 p-8 bg-gray-800 text-white rounded-2xl shadow-2xl">
-                <h1 className="text-3xl font-bold text-center mb-6">Admin Login</h1>
-                {error && <p className="text-red-600 text-center mb-4">{error}</p>}
-
+            <img 
+                src="/globequest.png" 
+                alt="Admin Login" 
+                className="mx-auto mb-6 w-40 h-auto"
+            />                
+            {error && <p className="text-red-600 text-center mb-4">{error}</p>}
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
                     <input
                         type="email"
