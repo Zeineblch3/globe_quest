@@ -1,23 +1,28 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import Globe from '../components/Globe';
-import { FaMap, FaBook, FaCloudSun} from 'react-icons/fa';
+import { FaMap, FaBook, FaCloudSun, FaInfoCircle, FaEnvelope, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { Canvas } from '@react-three/fiber';
 import Stars from './Stars';
+import { X } from 'lucide-react';
 
 const GlobePage: React.FC = () => {
   const controlsRef = useRef(null);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const handleBackOffice = () => {
     window.open('/login', '_blank');
   };
-  
 
   const handleOpenBook = () => {
     window.open('https://risper-catalogue.vercel.app/', '_blank');
   };
+
+  const toggleContactPanel = () => setIsContactOpen(!isContactOpen);
+  const toggleAboutPanel = () => setIsAboutOpen(!isAboutOpen);
 
   return (
     <div className="relative w-full h-screen flex flex-col text-white animated-bg">
@@ -33,14 +38,14 @@ const GlobePage: React.FC = () => {
         <nav className="hidden md:flex space-x-8">
           <a href="#" className="hover:text-gray-300">Destinations</a>
           <a href="#" className="hover:text-gray-300">Tours</a>
-          <a href="#" className="hover:text-gray-300">About Us</a>
-          <a href="#" className="hover:text-gray-300">Contact</a>
+          <a href="#" className="hover:text-gray-300" onClick={toggleAboutPanel}>About Us</a>
+          <a href="#" className="hover:text-gray-300" onClick={toggleContactPanel}>Contact</a>
         </nav>
         {/* Back Office Button */}
         <button
           onClick={handleBackOffice}
           className="px-6 py-2 border border-gray-400 rounded-full hover:bg-gray-500/40 hover:text-gray-100 transition"
-          >
+        >
           Back Office
         </button>
       </header>
@@ -51,9 +56,102 @@ const GlobePage: React.FC = () => {
           <ambientLight intensity={1.5} />
           <directionalLight position={[1, 1, 1]} intensity={2} />
           <Globe scale={15} position={[0, 0, 0]} />
-          <OrbitControls ref={controlsRef} minDistance={2.8} maxDistance={5} />
+          <OrbitControls ref={controlsRef} minDistance={2.8} maxDistance={7} />
         </Canvas>
       </div>
+
+     {/* Contact Panel - Enhanced UI */}
+      {isContactOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative border border-purple-500/20">
+            {/* Close button */}
+            <button
+              onClick={toggleContactPanel}
+              className="absolute top-4 right-4 text-white bg-gray-800 p-2 rounded-full hover:bg-gray-700 transition-all duration-300 hover:rotate-90 z-10"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8">
+              <div className="flex items-center justify-center">
+                <FaEnvelope className="h-10 w-10 text-white mr-4" />
+                <h2 className="text-4xl font-bold text-white">Contact Us</h2>
+              </div>
+              <p className="text-center text-white/80 mt-4 max-w-md mx-auto">
+                We're here to help with your travel needs. Reach out to us through any of these channels.
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <p className="text-l text-white">
+                    <strong>Address:</strong> 2éme étage, Imm Mlika, 2 Rue des Palmiers, Sousse 4051
+                  </p>
+                  <p className="text-l text-white">
+                    <strong>Phone:</strong> +216 21 708 608
+                  </p>
+                  <p className="text-l text-white">
+                    <strong>Email:</strong> <a href="mailto:Hello@rispertravel.com" className="text-blue-400">Hello@rispertravel.com</a>
+                  </p>
+                  <p className="text-l text-white">
+                    <strong>B2B Email:</strong> <a href="mailto:b2b@rispertravel.com" className="text-blue-400">b2b@rispertravel.com</a>
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <p className="text-l text-white">
+                    <strong>Social Media:</strong>
+                  </p>
+                  <div className="flex space-x-4">
+                    <FaFacebook className="text-white text-2xl cursor-pointer" />
+                    <FaInstagram className="text-white text-2xl cursor-pointer" />
+                    <FaTwitter className="text-white text-2xl cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* About Panel - Enhanced UI */}
+      {isAboutOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative border border-purple-500/20">
+            {/* Close button */}
+            <button
+              onClick={toggleAboutPanel}
+              className="absolute top-4 right-4 text-white bg-gray-800 p-2 rounded-full hover:bg-gray-700 transition-all duration-300 hover:rotate-90 z-10"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8">
+              <div className="flex items-center justify-center">
+                <FaInfoCircle className="h-10 w-10 text-white mr-4" />
+                <h2 className="text-4xl font-bold text-white">About Us</h2>
+              </div>
+              <p className="text-center text-white/80 mt-4 max-w-md mx-auto">
+                We provide immersive travel experiences across the globe. Explore with us!
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-8">
+            <p className="text-l text-white">
+              <strong>Welcome to Risper Travel Tours!</strong><br />
+              <span className="block mt-4">We are a premier travel agency dedicated to crafting personalized and unforgettable travel experiences. With our expert team and commitment to excellence, we ensure every journey is seamless, safe, and filled with remarkable memories.</span>
+              <span className="block mt-4">Discover the world with us! ✈️🌎</span>
+            </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* Floating Action Buttons */}
       <div className="absolute bottom-10 right-6 flex flex-col space-y-4 z-20">
