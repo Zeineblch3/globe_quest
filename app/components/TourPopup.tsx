@@ -1,5 +1,3 @@
-// TourPopup.tsx
-
 import React from 'react';
 import Carousel from './Carousel';
 
@@ -20,18 +18,19 @@ const TourPopup: React.FC<TourPopupProps> = ({
 }) => {
   return (
     <div
-      className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-500"
-      style={{
-        width: '500px',
-        height: '600px',
-        overflowY: 'auto',
-        pointerEvents: 'auto', // Ensure pointer events are enabled
-        zIndex: 1000, // Ensure the popup is on top
-      }}
+      className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-xl text-center border border-gray-300 transition-all duration-500 max-w-md relative"
     >
-      <h3 className="text-xl font-bold text-gray-900 mb-4">{tour.name}</h3>
+      {/* Close Button */}
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 px-3 py-1 bg-gray-400 text-white rounded-full hover:bg-gray-600 transition"
+      >
+        ✕
+      </button>
 
-      {/* Image carousel */}
+      <h3 className="text-2xl font-semibold text-gray-900 mb-3">{tour.name}</h3>
+
+      {/* Image Carousel */}
       <Carousel
         photos={tour.photo_urls}
         currentIndex={currentImageIndex}
@@ -39,30 +38,18 @@ const TourPopup: React.FC<TourPopupProps> = ({
         onPrev={onPrevImage}
       />
 
-      <h3 className="text-xl font-bold text-gray-900 mb-4">${tour.price}</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mt-3">${tour.price}</h3>
 
-      <p className="text-gray-700 mb-4">
-        <a
-          href={tour.tripAdvisor_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 underline"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevents the click from closing the popup
-          }}
-          style={{ pointerEvents: 'auto' }} // Ensure pointer events are enabled on the link
-        >
-          Visit TripAdvisor
-        </a>
-      </p>
+      <p className="text-gray-700 my-2">{tour.description}</p>
 
-      <p className="text-gray-700 mb-4">{tour.description}</p>
-      <button
-        onClick={onClose}
-        className="mt-2 px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+      <a
+        href={tour.tripAdvisor_link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 underline font-medium hover:text-blue-600 transition"
       >
-        Close
-      </button>
+        Visit TripAdvisor
+      </a>
     </div>
   );
 };

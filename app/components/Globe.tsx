@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Html, Sphere, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useThree, useFrame } from '@react-three/fiber';
-import TourPopup from './TourPopup'; // Import the TourPopup component
+import TourPopup from './TourPopup';
 import { fetchTours } from '../Services/tourService';
 
 // Convert Lat/Lon to 3D Coordinates
@@ -23,14 +23,15 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
   scale = 1,
   position = [0, 0, 0],
 }) => {
-  const { scene } = useGLTF('/models/scene.gltf'); // Load 3D globe model
+  const { scene } = useGLTF('/models/scene.gltf');
   const globeRef = useRef<THREE.Group>(null);
   const pinsRef = useRef<THREE.Mesh[]>([]);
-  const { camera } = useThree(); // Move inside the component
+  const popupRef = useRef<THREE.Group>(null);
+  const { camera } = useThree();
 
   const [tours, setTours] = useState<any[]>([]);
   const [selectedTour, setSelectedTour] = useState<any>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Index for current image
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const getTours = async () => {
@@ -59,13 +60,22 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
     setSelectedTour(null);
   };
 
-  // Scale pins dynamically based on camera zoom
+  // Adjust popup position and rotation to always face the user
+  useFrame(() => {
+    if (popupRef.current && selectedTour) {
+      const popupPosition = new THREE.Vector3(selectedTour.x, selectedTour.y + 0.3, selectedTour.z);
+      popupRef.current.position.copy(popupPosition);
+      popupRef.current.lookAt(camera.position);
+    }
+  });
+
+  // Dynamic pin scaling based on camera zoom
   useFrame(() => {
     if (!pinsRef.current.length) return;
 
-    const distance = camera.position.length(); // Distance from globe
-    const baseSize = 0.1; // Bigger base size to ensure visibility
-    const scaleFactor = Math.max(0.02, baseSize * (distance / 5)); // Prevent scaling to 0
+    const distance = camera.position.length();
+    const baseSize = 0.1;
+    const scaleFactor = Math.max(0.02, baseSize * (distance / 5));
 
     pinsRef.current.forEach((pin) => {
       if (pin) pin.scale.set(scaleFactor, scaleFactor, scaleFactor);
@@ -80,7 +90,7 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
 
         {/* 3D Tour Pins */}
         {tours.map((tour, index) => {
-          const radius = 2.5; // Adjusted for the globe size
+          const radius = 2.5;
           const { x, y, z } = toCartesian(tour.latitude, tour.longitude, radius);
 
           return (
@@ -93,30 +103,31 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
               rotation={[-Math.PI, 0, 0]}
               onPointerDown={(event) => {
                 event.stopPropagation();
-                setSelectedTour(tour);
-                setCurrentImageIndex(0); // Reset to the first image
+                setSelectedTour({ ...tour, x, y, z });
+                setCurrentImageIndex(0);
               }}
             >
-             <Sphere args={[0.1, 32, 32]}>
+              <Sphere args={[0.1, 32, 32]}>
                 <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
               </Sphere>
-
             </mesh>
           );
         })}
       </group>
 
-      {/* Show the tour popup if a tour is selected */}
+      {/* Tour Popup - Always Faces the User */}
       {selectedTour && (
-        <Html position={[0, 0, 0]} center>
-          <TourPopup
-            tour={selectedTour}
-            currentImageIndex={currentImageIndex}
-            onNextImage={handleNextImage}
-            onPrevImage={handlePrevImage}
-            onClose={handleClosePopup}
-          />
-        </Html>
+        <group ref={popupRef}>
+          <Html center distanceFactor={2} transform>
+            <TourPopup
+              tour={selectedTour}
+              currentImageIndex={currentImageIndex}
+              onNextImage={handleNextImage}
+              onPrevImage={handlePrevImage}
+              onClose={handleClosePopup}
+            />
+          </Html>
+        </group>
       )}
     </>
   );
