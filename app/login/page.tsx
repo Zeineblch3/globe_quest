@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { loginWithEmail, loginWithGoogle, resetPassword } from '../Services/authService';
-import Image from 'next/image';
+import { loginWithEmail, resetPassword } from '../Services/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -35,10 +34,6 @@ export default function Login() {
     setLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    const googleError = await loginWithGoogle();
-    if (googleError) setError(googleError);
-  };
 
   const handlePasswordReset = async () => {
     setResetMessage(null);
@@ -57,21 +52,32 @@ export default function Login() {
             <img 
                 src="/globequest.png" 
                 alt="Admin Login" 
-                className="mx-auto mb-6 w-40 h-auto"
-            />                
-            {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+                className="mx-auto mb-7 w-40 h-auto"
+            />  
+        <h1 className="text-2xl font-semibold text-center mb-5">Admin Login</h1>
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                    <input
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                        Email 
+                        </label>
+                        <input
+                        id="email"
                         type="email"
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         autoComplete="new-email"
                         className="w-full p-3 text-gray-900 bg-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                        />
+                    </div>
 
                     <div className="relative">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                            Password
+                        </label>
                         <input
+                            id="password"
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Enter your password"
                             value={password}
@@ -82,7 +88,7 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-gray-800"
+                            className="absolute right-3 top-1/2 transform flex items-center text-gray-600 hover:text-gray-800"
                         >
                             {showPassword ? <EyeIcon size={20} /> : <EyeOffIcon size={20} />}
                         </button>
@@ -108,16 +114,6 @@ export default function Login() {
                     </div>
                 </form>
 
-                {/* Google Login */}
-                <div className="flex items-center justify-center mt-6">
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="flex items-center justify-center w-full px-4 py-2 bg-transparent border border-gray-500 rounded-lg hover:bg-gray-500 transition"
-                    >
-                        <Image src="/google-logo.png" alt="Google Logo" width={30} height={30} className="mr-3" />
-                        <span className="text-white-100">Login with Google</span>
-                    </button>
-                </div>
             </div>
 
             {/* Forgot Password Popup */}
@@ -125,7 +121,7 @@ export default function Login() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white w-96">
                         <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
-                        {resetMessage && <p className="text-center mb-3">{resetMessage}</p>}
+                        {resetMessage && <p className="text-center text-blue-600 mb-3">{resetMessage}</p>}
                         <input
                             type="email"
                             placeholder="Enter your email"
