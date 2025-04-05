@@ -7,11 +7,15 @@ import { FaMap, FaBook, FaCloudSun, FaInfoCircle, FaEnvelope, FaFacebook, FaInst
 import { Canvas } from '@react-three/fiber';
 import Stars from './Stars';
 import { X } from 'lucide-react';
+import { FaGlobe } from 'react-icons/fa';
+
 
 const GlobePage: React.FC = () => {
   const controlsRef = useRef(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
+
 
   const handleBackOffice = () => {
     window.open('/login', '_blank');
@@ -50,12 +54,34 @@ const GlobePage: React.FC = () => {
         </button>
       </header>
 
+      {/* rotation globe */}
+      <div className="absolute top-1/2 left-5 transform -translate-y-1/2 z-20 group">
+        <button
+          onClick={() => setAutoRotate((prev) => !prev)}
+          className="relative p-4 rounded-full bg-gray-800 hover:bg-gray-700 shadow-lg transition-transform"
+          title={autoRotate ? 'Stop Rotation' : 'Start Rotation'}
+        >
+          <FaGlobe className="text-white text-2xl" />
+
+          {/* Bar overlay when autoRotate is false */}
+          {!autoRotate && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-[2px] h-full bg-white rotate-45" />
+            </div>
+          )}
+        </button>
+        <span className="absolute left-18 mr-3 px-4 py-2 text-lg text-white bg-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+          {autoRotate ? 'Stop Globe' : 'Start Globe'}
+        </span>
+      </div>
+
+
       {/* Canvas Section */}
       <div className="w-full h-full relative z-10">
         <Canvas>
           <ambientLight intensity={1.5} />
           <directionalLight position={[1, 1, 1]} intensity={2} />
-          <Globe scale={15} position={[0, 0, 0]} />
+          <Globe scale={15} position={[0, 0, 0]} rotate={autoRotate}/>
           <OrbitControls ref={controlsRef} minDistance={2.8} maxDistance={7} />
         </Canvas>
       </div>

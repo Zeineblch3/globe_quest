@@ -19,9 +19,10 @@ const toCartesian = (lat: number, lon: number, radius: number) => {
   return new THREE.Vector3(x, y, z);
 };
 
-const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> = ({
+const Globe: React.FC<{ scale?: number; position?: [number, number, number]; rotate?: boolean }> = ({
   scale = 1,
   position = [0, 0, 0],
+  rotate = true,
 }) => {
   const { scene } = useGLTF('/models/scene.gltf');
   const globeRef = useRef<THREE.Group>(null);
@@ -63,9 +64,20 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number] }> =
   // Adjust popup position and rotation to always face the user
   useFrame(() => {
     if (popupRef.current && selectedTour) {
-      const popupPosition = new THREE.Vector3(selectedTour.x, selectedTour.y + 0.3, selectedTour.z);
-      popupRef.current.position.copy(popupPosition);
+      const popupPosition = new THREE.Vector3(selectedTour.x, selectedTour.y + 0.05, selectedTour.z);
+  
+      // Smoothly interpolate position to avoid rapid movement
+      popupRef.current.position.lerp(popupPosition, 0.1);  // 0.1 is the smoothing factor
+  
       popupRef.current.lookAt(camera.position);
+    }
+  });
+  
+
+  //globe rotation
+  useFrame(() => {
+    if (rotate && globeRef.current) {
+      globeRef.current.rotation.y += 0.003; // smooth automatic rotation
     }
   });
 
