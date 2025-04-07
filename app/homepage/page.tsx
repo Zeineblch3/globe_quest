@@ -131,10 +131,17 @@ const GlobePage: React.FC = () => {
                     <strong>Social Media:</strong>
                   </p>
                   <div className="flex space-x-4">
-                    <FaFacebook className="text-white text-2xl cursor-pointer" />
-                    <FaInstagram className="text-white text-2xl cursor-pointer" />
-                    <FaTwitter className="text-white text-2xl cursor-pointer" />
+                    <a href="https://www.facebook.com/rispertravel" target="_blank" rel="noopener noreferrer">
+                      <FaFacebook className="text-white text-2xl cursor-pointer" />
+                    </a>
+                    <a href="https://www.instagram.com/risper_travel_tours?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">
+                      <FaInstagram className="text-white text-2xl cursor-pointer" />
+                    </a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                      <FaTwitter className="text-white text-2xl cursor-pointer" />
+                    </a>
                   </div>
+
                 </div>
               </div>
             </div>
