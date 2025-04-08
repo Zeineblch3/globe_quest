@@ -39,7 +39,7 @@ const GlobePage: React.FC = () => {
           <span>GlobeQuest</span>
         </div>
         {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-8">
+        <nav className="md:flex space-x-8 hidden">
           <a href="#" className="hover:text-gray-300">Destinations</a>
           <a href="#" className="hover:text-gray-300">Tours</a>
           <a href="#" className="hover:text-gray-300" onClick={toggleAboutPanel}>About Us</a>
@@ -77,7 +77,7 @@ const GlobePage: React.FC = () => {
 
 
       {/* Canvas Section */}
-      <div className="w-full h-full relative z-10">
+      <div className="w-full h-[80vh] md:h-full relative z-10">
         <Canvas>
           <ambientLight intensity={1.5} />
           <directionalLight position={[1, 1, 1]} intensity={2} />
@@ -89,7 +89,7 @@ const GlobePage: React.FC = () => {
      {/* Contact Panel - Enhanced UI */}
       {isContactOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative border border-purple-500/20">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-purple-500/20">
             {/* Close button */}
             <button
               onClick={toggleContactPanel}
@@ -152,7 +152,7 @@ const GlobePage: React.FC = () => {
       {/* About Panel - Enhanced UI */}
       {isAboutOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden relative border border-purple-500/20">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden relative border border-purple-500/20">
             {/* Close button */}
             <button
               onClick={toggleAboutPanel}
