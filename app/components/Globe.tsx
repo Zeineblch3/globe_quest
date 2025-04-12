@@ -119,10 +119,12 @@ const Globe: React.FC<{ scale?: number; position?: [number, number, number]; rot
                 setCurrentImageIndex(0);
               }}
             >
-              <Sphere args={[0.1, 32, 32]}>
-                <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
-              </Sphere>
+              {/* Cone base */}
+              <coneGeometry args={[0.2, 1.5, 32]} />
+              <meshStandardMaterial color={selectedTour?.id === tour.id ? 'yellow' : 'red'} />
             </mesh>
+
+
           );
         })}
       </group>

@@ -9,7 +9,8 @@ import {
   createTourEvent, 
   updateTourEventTourist, 
   fetchTourEventById, 
-  deleteTourist
+  deleteTourist,
+  deleteTourEventWithTourists
 } from '../Services/tourEventService';
 
 // Define a type for Tourist
@@ -183,6 +184,19 @@ export default function TourEvent() {
     }
   };
 
+  const handleDelete = async (eventId: string) => {
+    if (!confirm('Are you sure you want to delete this event and all its tourists?')) return;
+  
+    try {
+      await deleteTourEventWithTourists(eventId);
+      const updatedEvents = await fetchTourEvents();
+      setTourEvents(updatedEvents.filter((event: any) => !event.archived));
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
+  
+
   return (
     <div>
       {/* Top Actions */}
@@ -241,6 +255,13 @@ export default function TourEvent() {
                         className="bg-gray-600 text-white p-2 rounded hover:bg-gray-400"
                       >
                         <Archive size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 text-sm"
+                        title="Delete"
+                      >
+                        Delete
                       </button>
                     </div>
                   </td>

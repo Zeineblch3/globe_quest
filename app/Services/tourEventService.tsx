@@ -235,3 +235,33 @@ export const deleteTourist = async (touristId: string) => {
 
   return { success: true };
 };
+
+export const deleteTourEventWithTourists = async (eventId: string) => {
+  try {
+    // First delete tourists linked to this event
+    const { error: touristError } = await supabase
+      .from("tourists")
+      .delete()
+      .eq("tour_event_id", eventId);
+
+    if (touristError) {
+      throw new Error("Failed to delete linked tourists: " + touristError.message);
+    }
+
+    // Then delete the event itself
+    const { error: eventError } = await supabase
+      .from("tour_events")
+      .delete()
+      .eq("id", eventId);
+
+    if (eventError) {
+      throw new Error("Failed to delete tour event: " + eventError.message);
+    }
+
+    return { success: true, message: "Tour event and tourists deleted." };
+  } catch (error) {
+    console.error("Error deleting event with tourists:", error);
+    return { success: false, message: (error as Error).message };
+  }
+};
+
