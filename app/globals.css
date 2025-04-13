@@ -104,3 +104,7 @@ body {
   0% { opacity: 0.15; }
   100% { opacity: 0.35; }
 }
+
+.fixed.bottom-4.right-4 {
+  z-index: 50; /* Guide above everything */
+}
