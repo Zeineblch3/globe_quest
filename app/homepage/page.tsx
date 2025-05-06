@@ -8,7 +8,6 @@ import { Canvas } from '@react-three/fiber';
 import Stars from './Stars';
 import { X } from 'lucide-react';
 import { FaGlobe } from 'react-icons/fa';
-import { VirtualGuide } from '../components/VirtualGuide';
 
 
 const GlobePage: React.FC = () => {
@@ -86,20 +85,6 @@ const GlobePage: React.FC = () => {
     <OrbitControls ref={controlsRef} minDistance={2.8} maxDistance={7} />
   </Canvas>
 </div>
-
-{/* Virtual Guide (fixed modal) */}
-<div className="fixed bottom-4 right-4 z-50 bg-white p-4 rounded shadow-md max-w-sm">
-  {/* Virtual Guide Character */}
-  <VirtualGuide
-    sceneUrl="https://my.spline.design/robottutorialinteractiveeventscopy-T2dVGKwQBzPJOROLQexHZvs7/"
-    description="Welcome to the sacred temples of Kyoto. Let me guide you."
-    visible={true}
-    style={{ pointerEvents: 'auto' }} // Ensure that the Spline component is clickable
-  />
-</div>
-
-
-
 
      {/* Contact Panel - Enhanced UI */}
       {isContactOpen && (
