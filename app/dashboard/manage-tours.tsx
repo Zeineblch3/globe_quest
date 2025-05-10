@@ -178,16 +178,35 @@ export default function ManageTours() {
     };
 
 
-    const handleDeleteTour = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this tour?')) {
-            const { error } = await tourService.deleteTour(id);
-            if (error) {
-                console.error('Error deleting tour:', error);
-                return;
+   const handleDeleteTour = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this tour?')) return;
+
+    const { error } = await tourService.deleteTour(id);
+
+    if (error) {
+        const isForeignKeyError =
+            error.message?.toLowerCase().includes('foreign key');
+
+        if (isForeignKeyError) {
+            window.alert(
+                'This tour is linked to existing tour events.\n\nPlease delete the related events before deleting this tour.'
+            );
+        } else {
+            // Log to console in dev only, silently fail in prod
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('Unexpected error while deleting tour:', error.message || error);
             }
-            fetchTours();
+            window.alert('Could not delete the tour. Please try again later.');
         }
-    };
+
+        return; // Prevent propagation
+    }
+
+    fetchTours();
+};
+
+
+
 
     const handleArchiveTour = async (tourId: string) => {
         const { error } = await tourService.archiveTour(tourId);
